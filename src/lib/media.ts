@@ -1,4 +1,15 @@
 import { createHash } from 'node:crypto';
+import { createAdminClient, hasServiceKey } from '@/lib/supabase/admin';
+
+// Short-lived signed URLs for private files. Call only after the caller's RLS read has succeeded.
+export async function signPaths(bucket: string, paths: (string | null | undefined)[]) {
+  const urls = new Map<string, string>();
+  const list = [...new Set(paths.filter((p): p is string => !!p))];
+  if (!list.length || !hasServiceKey()) return urls;
+  const { data } = await createAdminClient().storage.from(bucket).createSignedUrls(list, 600);
+  data?.forEach((d) => { if (d.path && d.signedUrl) urls.set(d.path, d.signedUrl); });
+  return urls;
+}
 
 export type SignedVideo = { src: string; kind: 'hls' | 'file'; qs?: string };
 

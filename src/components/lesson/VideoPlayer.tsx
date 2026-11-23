@@ -114,7 +114,10 @@ export default function VideoPlayer({ video, mark, lang }: { video: VideoSrc; ma
         onClick={toggle}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
-        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+        onTimeUpdate={(e) => {
+          setTime(e.currentTarget.currentTime);
+          window.dispatchEvent(new CustomEvent('edusite:time', { detail: e.currentTarget.currentTime }));
+        }}
         onLoadedMetadata={(e) => setDur(e.currentTarget.duration)}
         className="h-full w-full bg-black"
       />

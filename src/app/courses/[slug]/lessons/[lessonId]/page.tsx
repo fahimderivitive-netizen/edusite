@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Lock, PlayCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Lock, PlayCircle } from 'lucide-react';
+import Comments from '@/components/engage/Comments';
+import { toggleComplete } from '@/app/engage/actions';
 import { createClient } from '@/lib/supabase/server';
 import { getCurriculum } from '@/lib/curriculum';
 import { connection } from 'next/server';
@@ -43,6 +45,8 @@ export default async function LessonPage({
   const { data: { user } } = await supabase.auth.getUser();
   const phone = user ? (await supabase.from('profiles').select('phone').eq('id', user.id).maybeSingle()).data?.phone : null;
   const mark = user ? [user.email, user.id.slice(0, 8), phone].filter(Boolean).join(' · ') : '';
+  const { data: doneRows } = user ? await supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id) : { data: [] };
+  const done = new Set((doneRows ?? []).map((r) => r.lesson_id));
 
   const prev = flat[index - 1];
   const next = flat[index + 1];
@@ -87,6 +91,17 @@ export default async function LessonPage({
                 )}
               </div>
 
+              {user && (
+                <form action={toggleComplete} className="mt-4 flex flex-wrap items-center gap-3">
+                  <input type="hidden" name="lesson_id" value={lesson.id} />
+                  <input type="hidden" name="slug" value={slug} />
+                  <button className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition active:scale-95 ${done.has(lesson.id) ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300' : 'border-white/10 text-zinc-300 hover:border-white/20'}`}>
+                    <CheckCircle2 size={16} /> {done.has(lesson.id) ? t.engage.done : t.engage.complete}
+                  </button>
+                  <Link href={`/doubts?lesson=${lesson.id}`} className="text-sm text-emerald-400 hover:text-emerald-300">{t.engage.askDoubt}</Link>
+                </form>
+              )}
+
               <div className="mt-6 flex items-center justify-between gap-3">
                 {prev ? (
                   <Link href={`/courses/${slug}/lessons/${prev.id}`} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-white/20 hover:text-zinc-100 active:scale-95">
@@ -99,6 +114,7 @@ export default async function LessonPage({
                   </Link>
                 )}
               </div>
+              {user && <Comments lessonId={lesson.id} slug={slug} lang={lang} />}
             </>
           )}
         </div>
@@ -129,7 +145,7 @@ export default async function LessonPage({
                           >
                             <span className="w-5 shrink-0 text-xs tabular-nums text-zinc-500">{li + 1}</span>
                             <span className="flex-1">{pick(lang, l.title, l.title_bn)}</span>
-                            {locked ? <Lock size={16} className="shrink-0" /> : <PlayCircle size={16} className="shrink-0" />}
+                            {locked ? <Lock size={16} className="shrink-0" /> : done.has(l.id) ? <CheckCircle2 size={16} className="shrink-0 text-emerald-400" /> : <PlayCircle size={16} className="shrink-0" />}
                           </Link>
                         </li>
                       );

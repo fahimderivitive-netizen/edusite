@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
   )
   const { data: { user } } = await supabase.auth.getUser()
   const p = request.nextUrl.pathname
-  if (!user && ['/dashboard', '/admin', '/exams', '/support'].some((x) => p.startsWith(x)))
+  if (!user && ['/dashboard', '/admin', '/exams', '/support', '/doubts'].some((x) => p.startsWith(x)))
     return NextResponse.redirect(new URL('/login', request.url))
   return response
 }
