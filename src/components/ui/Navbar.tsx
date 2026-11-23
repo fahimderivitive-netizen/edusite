@@ -42,6 +42,7 @@ export default async function Navbar() {
           {user ? (
             <>
               {(role === 'admin' || role === 'moderator') && <Link href="/admin" className={link}>Admin</Link>}
+              <Link href="/exams" className={`hidden sm:block ${link}`}>{t.nav.exams}</Link>
               <Link href="/dashboard" className={link}>{t.nav.dashboard}</Link>
               <form action={logout}>
                 <button className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">{t.nav.logout}</button>
