@@ -20,6 +20,7 @@ export default async function Navbar() {
   const { lang, t } = await getT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const role = user ? (await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()).data?.role : null;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09090B]/80 backdrop-blur-md">
@@ -40,6 +41,7 @@ export default async function Navbar() {
           </form>
           {user ? (
             <>
+              {(role === 'admin' || role === 'moderator') && <Link href="/admin" className={link}>Admin</Link>}
               <Link href="/dashboard" className={link}>{t.nav.dashboard}</Link>
               <form action={logout}>
                 <button className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">{t.nav.logout}</button>
