@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Courses() {
@@ -71,7 +72,7 @@ export default function Courses() {
             <p className="text-gray-600 mb-4">{course.description}</p>
             <div className="flex justify-between items-center">
               <span className="text-gray-500">${course.price}</span>
-              <button className="text-blue-600 hover:underline">View Course</button>
+              <Link href={`/courses/${course.id}`} className="text-blue-600 hover:underline">View Course</Link>
             </div>
           </div>
         ))}

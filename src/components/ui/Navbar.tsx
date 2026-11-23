@@ -9,7 +9,7 @@ export default function Navbar() {
           <Link href="/" className="hover:text-blue-600">Home</Link>
           <Link href="/courses" className="hover:text-blue-600">Courses</Link>
           <Link href="/dashboard" className="hover:text-blue-600">Dashboard</Link>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Login/Signup</button>
+          <Link href="/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Login/Signup</Link>
         </div>
       </div>
     </nav>

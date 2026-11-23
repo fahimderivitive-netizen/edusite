@@ -1,3 +1,4 @@
+import Link from 'next/link';
 export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -5,7 +6,7 @@ export default function Home() {
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-6xl font-bold mb-4">Learn Anything, Anywhere</h1>
         <p className="text-xl text-gray-600 mb-8">High-quality courses from top instructors</p>
-        <button className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700 transition">Browse Courses</button>
+        <Link href="/courses" className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700 transition">Browse Courses</Link>
       </div>
 
       {/* Featured Courses Grid */}
@@ -16,7 +17,7 @@ export default function Home() {
             <p className="text-gray-600 mb-4">Short description of course {i} content and learning outcomes.</p>
             <div className="flex justify-between items-center">
               <span className="text-gray-500">$99</span>
-              <button className="text-blue-600 hover:underline">View Course</button>
+              <Link href={`/courses/${i}`} className="text-blue-600 hover:underline">View Course</Link>
             </div>
           </div>
         ))}

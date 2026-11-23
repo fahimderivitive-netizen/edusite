@@ -1,7 +1,8 @@
-import { useState } from 'react';
+'use client';
+import { use, useState } from 'react';
 
-export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
-  const slug = (await params).slug;
+export default function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
 
   // Mock course data
   const course = {
@@ -49,8 +50,8 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
 
       <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
         <p className="text-gray-600 mb-4">{course.description}</p>
-        <p className="text-gray-500"><strong>Instructor:> {course.instructor}</strong></p>
-        <p className="text-gray-500"><strong>Price:> ${course.price}</strong></p>
+       <p className="text-gray-500"><strong>Instructor:</strong> {course.instructor}</p>
+<p className="text-gray-500"><strong>Price:</strong> ${course.price}</p>
         <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
           Enroll Now
         </button>
