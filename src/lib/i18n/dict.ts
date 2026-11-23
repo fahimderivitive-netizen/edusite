@@ -31,6 +31,10 @@ const en = {
     curriculum: 'Curriculum',
     freePreview: 'Free Preview',
     paidSoon: 'Online payment is coming soon',
+    buy: 'Buy now',
+    payOk: 'Payment successful. You are enrolled.',
+    payFail: 'Payment could not be verified. You were not charged, or it is under review.',
+    payCancel: 'Payment cancelled.',
   },
   lesson: {
     locked: 'This lesson is locked. Enroll in the course to unlock it.',
@@ -102,6 +106,10 @@ const bn: Dict = {
     curriculum: 'কারিকুলাম',
     freePreview: 'ফ্রি প্রিভিউ',
     paidSoon: 'অনলাইন পেমেন্ট শীঘ্রই আসছে',
+    buy: 'এখনই কিনুন',
+    payOk: 'পেমেন্ট সফল হয়েছে। তুমি এনরোল হয়েছ।',
+    payFail: 'পেমেন্ট যাচাই করা যায়নি। টাকা কাটা না হলে চিন্তার কিছু নেই, অথবা এটি পর্যালোচনায় আছে।',
+    payCancel: 'পেমেন্ট বাতিল করা হয়েছে।',
   },
   lesson: {
     locked: 'এই লেসনটি লক করা। আনলক করতে কোর্সে এনরোল করো।',

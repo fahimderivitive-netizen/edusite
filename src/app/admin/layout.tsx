@@ -10,6 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/admin', label: 'Overview', show: true },
     { href: '/admin/courses', label: 'Courses', show: s.scopes.includes('content') },
     { href: '/admin/users', label: 'Users', show: s.role === 'admin' },
+    { href: '/admin/payments', label: 'Payments', show: s.role === 'admin' },
   ].filter((n) => n.show);
 
   return (

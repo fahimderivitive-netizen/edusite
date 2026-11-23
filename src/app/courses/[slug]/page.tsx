@@ -6,10 +6,13 @@ import { getCurriculum } from '@/lib/curriculum';
 import { connection } from 'next/server';
 import { getT } from '@/lib/i18n/server';
 import { fmt, money, pick } from '@/lib/i18n/dict';
+import { sslConfigured } from '@/lib/sslcommerz';
+import { startPayment } from './actions';
 export const instant = false
-export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CoursePage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ pay?: string }> }) {
   await connection();
   const { slug } = await params;
+  const { pay } = await searchParams;
   const { lang, t } = await getT();
   const supabase = await createClient();
 
@@ -44,6 +47,11 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
 
   return (
     <div>
+      {(pay === 'success' || pay === 'fail' || pay === 'cancel') && (
+        <p className={`px-4 py-3 text-center text-sm ${pay === 'success' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-200'}`}>
+          {pay === 'success' ? t.course.payOk : pay === 'fail' ? t.course.payFail : t.course.payCancel}
+        </p>
+      )}
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_-10%,rgba(52,211,153,0.16),transparent_70%)]" />
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-[1fr_360px] lg:py-20">
@@ -71,7 +79,16 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                   <CheckCircle2 size={16} /> {t.course.enrolled}
                 </span>
               ) : paid ? (
-                <span className="block rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-zinc-400">{t.course.paidSoon}</span>
+                sslConfigured() ? (
+                  <form action={startPayment}>
+                    <input type="hidden" name="course_id" value={course.id} />
+                    <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(52,211,153,0.3)] transition hover:bg-emerald-300 active:scale-[0.98]">
+                      {t.course.buy} · {money(course.price, lang)}
+                    </button>
+                  </form>
+                ) : (
+                  <span className="block rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-zinc-400">{t.course.paidSoon}</span>
+                )
               ) : (
                 <form action={enroll}>
                   <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(52,211,153,0.3)] transition hover:bg-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] active:scale-[0.98]">
