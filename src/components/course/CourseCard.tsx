@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowRight, BookOpen, Code2, Database, Palette } from 'lucide-react';
 
 export type CourseSummary = {
   id: string;
@@ -9,15 +10,47 @@ export type CourseSummary = {
   category: string | null;
 };
 
+const covers: Record<string, { bg: string; text: string; Icon: typeof Code2 }> = {
+  development: { bg: 'from-emerald-500/25 via-emerald-950/40 to-[#111113]', text: 'text-emerald-300', Icon: Code2 },
+  data: { bg: 'from-cyan-500/25 via-cyan-950/40 to-[#111113]', text: 'text-cyan-300', Icon: Database },
+  design: { bg: 'from-fuchsia-500/25 via-fuchsia-950/40 to-[#111113]', text: 'text-fuchsia-300', Icon: Palette },
+};
+const fallback = { bg: 'from-zinc-500/25 via-zinc-900/40 to-[#111113]', text: 'text-zinc-300', Icon: BookOpen };
+
+export function CourseCover({ category, className = 'h-36' }: { category: string | null; className?: string }) {
+  const { bg, text, Icon } = (category && covers[category]) || fallback;
+  return (
+    <div className={`relative overflow-hidden bg-gradient-to-br ${bg} ${className}`}>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+      <div className="absolute -right-6 -top-6 h-28 w-28 rotate-12 rounded-3xl border border-white/10" />
+      <div className="absolute -bottom-8 right-10 h-20 w-20 rounded-full border border-white/10" />
+      <Icon size={28} className={`absolute bottom-4 left-4 ${text}`} />
+    </div>
+  );
+}
+
 export default function CourseCard({ course }: { course: CourseSummary }) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
-      <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-      <p className="text-gray-600 mb-4">{course.description}</p>
-      <div className="flex justify-between items-center">
-        <span className="text-gray-500">${course.price}</span>
-        <Link href={`/courses/${course.slug}`} className="text-blue-600 hover:underline">View Course</Link>
+    <Link
+      href={`/courses/${course.slug}`}
+      className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#111113] transition duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+    >
+      <CourseCover category={course.category} />
+      <div className="flex flex-1 flex-col p-5">
+        <div className="mb-3 flex items-center justify-between">
+          {course.category ? (
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-medium capitalize text-zinc-300">{course.category}</span>
+          ) : <span />}
+          <span className="text-sm font-semibold text-emerald-400">
+            {Number(course.price) === 0 ? 'Free' : `$${course.price}`}
+          </span>
+        </div>
+        <h3 className="mb-2 text-lg text-zinc-100">{course.title}</h3>
+        <p className="mb-5 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{course.description}</p>
+        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300 transition group-hover:text-emerald-400">
+          View course <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }

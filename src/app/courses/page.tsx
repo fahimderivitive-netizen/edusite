@@ -12,8 +12,9 @@ export default async function Courses() {
   .order('title');
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Course Catalog</h1>
+    <div className="mx-auto max-w-6xl px-4 py-12">
+      <h1 className="text-3xl sm:text-4xl">Course Catalog</h1>
+      <p className="mb-8 mt-2 text-zinc-400">Find the right course and start learning today.</p>
       <CourseList courses={data ?? []} />
     </div>
   );

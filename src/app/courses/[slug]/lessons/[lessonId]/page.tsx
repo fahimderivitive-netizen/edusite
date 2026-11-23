@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft, ArrowRight, Lock, PlayCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getCurriculum } from '@/lib/curriculum';
 import { connection } from 'next/server';
@@ -39,35 +40,55 @@ export default async function LessonPage({
   const next = flat[index + 1];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex-1">
+    <div className="mx-auto w-full max-w-[1440px]">
+      <div className="flex flex-col lg:flex-row">
+        <div className="min-w-0 flex-1 px-4 py-6 sm:px-8">
+          <nav className="mb-4 flex items-center gap-2 text-sm text-zinc-500">
+            <Link href="/courses" className="transition hover:text-zinc-100">Courses</Link>
+            <span>/</span>
+            <Link href={`/courses/${slug}`} className="truncate text-zinc-300 transition hover:text-zinc-100">{course.title}</Link>
+          </nav>
+
           {!lesson ? (
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-              <h1 className="text-2xl font-bold mb-2">🔒 {flat[index].title}</h1>
-              <p className="text-gray-600 mb-4">Enroll in this course to unlock this lesson.</p>
-              <Link href={`/courses/${slug}`} className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                Back to course
+            <div className="rounded-2xl border border-white/10 bg-[#111113] p-10 text-center sm:p-16">
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-[#18181B]">
+                <Lock size={18} className="text-zinc-400" />
+              </div>
+              <h1 className="text-2xl">{flat[index].title}</h1>
+              <p className="mx-auto mb-6 mt-2 max-w-md text-zinc-400">This lesson is locked. Enroll in the course to unlock it.</p>
+              <Link href={`/courses/${slug}`} className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-white active:scale-95">
+                <ArrowLeft size={16} /> Back to course
               </Link>
             </div>
           ) : (
             <>
-              {lesson.video_url ? (
-                <video controls src={lesson.video_url} className="aspect-video w-full bg-gray-900" />
-              ) : (
-                <div className="aspect-video bg-gray-900 flex items-center justify-center text-gray-400">No video</div>
-              )}
-              <h1 className="text-3xl font-bold mt-6 mb-4">{lesson.title}</h1>
-              <div className="text-gray-600 mb-8 whitespace-pre-wrap">{lesson.content_md}</div>
-              <div className="flex space-x-4">
-                {prev && (
-                  <Link href={`/courses/${slug}/lessons/${prev.id}`} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
-                    Previous Lesson
-                  </Link>
+              <div className="overflow-hidden rounded-xl bg-black ring-1 ring-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+                {lesson.video_url ? (
+                  <video controls src={lesson.video_url} className="aspect-video w-full bg-black" />
+                ) : (
+                  <div className="flex aspect-video flex-col items-center justify-center gap-3 text-zinc-600">
+                    <PlayCircle size={18} className="h-14 w-14" strokeWidth={1} />
+                    <span className="text-sm">No video for this lesson</span>
+                  </div>
                 )}
+              </div>
+
+              <div className="mt-6 rounded-xl border border-white/10 bg-[#111113] p-6">
+                <h1 className="text-2xl sm:text-3xl">{lesson.title}</h1>
+                {lesson.content_md && (
+                  <div className="mt-4 whitespace-pre-wrap leading-relaxed text-zinc-400">{lesson.content_md}</div>
+                )}
+              </div>
+
+              <div className="mt-6 flex items-center justify-between gap-3">
+                {prev ? (
+                  <Link href={`/courses/${slug}/lessons/${prev.id}`} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-white/20 hover:text-zinc-100 active:scale-95">
+                    <ArrowLeft size={16} /> Previous
+                  </Link>
+                ) : <span />}
                 {next && (
-                  <Link href={`/courses/${slug}/lessons/${next.id}`} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Next Lesson
+                  <Link href={`/courses/${slug}/lessons/${next.id}`} className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-[0_0_20px_rgba(52,211,153,0.25)] transition hover:bg-emerald-300 active:scale-95">
+                    Next Lesson <ArrowRight size={16} />
                   </Link>
                 )}
               </div>
@@ -75,29 +96,43 @@ export default async function LessonPage({
           )}
         </div>
 
-        <div className="w-full md:w-64">
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h2 className="text-xl font-bold mb-4">{course.title}</h2>
-            <Link href={`/courses/${slug}`} className="block mb-4 text-blue-600 hover:underline">← Back to Course</Link>
-            {modules.map((m) => (
-              <div key={m.id} className="mb-6">
-                <h3 className="font-medium mb-2 text-gray-700">{m.title}</h3>
-                <ul className="space-y-2">
-                  {m.lessons.map((l) => (
-                    <li key={l.id}>
-                      <Link
-                        href={`/courses/${slug}/lessons/${l.id}`}
-                        className={`block p-2 rounded ${l.id === lessonId ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'}`}
-                      >
-                        {l.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        <aside className="w-full border-t border-white/10 bg-[#111113] lg:w-96 lg:shrink-0 lg:border-l lg:border-t-0">
+          <div className="lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
+            <div className="border-b border-white/10 p-5">
+              <h2 className="text-base leading-snug">{course.title}</h2>
+              <p className="mt-1 text-xs text-zinc-500">{flat.length} lessons</p>
+            </div>
+            <div className="divide-y divide-white/5">
+              {modules.map((m, mi) => (
+                <div key={m.id}>
+                  <h3 className="bg-[#18181B] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-zinc-400">{mi + 1}. {m.title}</h3>
+                  <ul>
+                    {m.lessons.map((l, li) => {
+                      const active = l.id === lessonId;
+                      const locked = !l.is_free_preview && !lesson && active;
+                      return (
+                        <li key={l.id}>
+                          <Link
+                            href={`/courses/${slug}/lessons/${l.id}`}
+                            className={`flex items-center gap-3 border-l-2 px-5 py-3 text-sm transition ${
+                              active
+                                ? 'border-emerald-400 bg-emerald-400/10 font-medium text-emerald-300'
+                                : 'border-transparent text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100'
+                            }`}
+                          >
+                            <span className="w-5 shrink-0 text-xs tabular-nums text-zinc-500">{li + 1}</span>
+                            <span className="flex-1">{l.title}</span>
+                            {locked ? <Lock size={16} className="shrink-0" /> : <PlayCircle size={16} className="shrink-0" />}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

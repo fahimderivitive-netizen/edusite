@@ -10,27 +10,35 @@ async function logout() {
   redirect('/login');
 }
 
+const link = 'rounded-md px-3 py-2 text-zinc-400 transition hover:bg-white/5 hover:text-zinc-100';
+
 export default async function Navbar() {
   await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-blue-600">EduSite</Link>
-        <div className="flex items-center space-x-4">
-          <Link href="/" className="hover:text-blue-600">Home</Link>
-          <Link href="/courses" className="hover:text-blue-600">Courses</Link>
+    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09090B]/80 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-2.5">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
+            <rect x="1" y="1" width="24" height="24" rx="7" className="fill-emerald-400/10 stroke-emerald-400/60" />
+            <path d="M8 17V9l5 3.5L18 9v8" className="stroke-emerald-300" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="font-[family-name:var(--font-heading)] text-lg font-extrabold tracking-[-0.02em]">EduSite</span>
+        </Link>
+        <div className="flex items-center gap-1 text-sm font-medium">
+          <Link href="/" className={`hidden sm:block ${link}`}>Home</Link>
+          <Link href="/courses" className={link}>Courses</Link>
           {user ? (
             <>
-              <Link href="/dashboard" className="hover:text-blue-600">Dashboard</Link>
+              <Link href="/dashboard" className={link}>Dashboard</Link>
               <form action={logout}>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Logout</button>
+                <button className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">Logout</button>
               </form>
             </>
           ) : (
-            <Link href="/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Login/Signup</Link>
+            <Link href="/login" className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">Login/Signup</Link>
           )}
         </div>
       </div>

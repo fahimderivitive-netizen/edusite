@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BookOpen, CheckCircle2, ChevronDown, Lock, PlayCircle } from 'lucide-react';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getCurriculum } from '@/lib/curriculum';
@@ -37,45 +38,80 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{course.title}</h1>
-
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <p className="text-gray-600 mb-4">{course.description}</p>
-        <p className="text-gray-500"><strong>Price:</strong> ${course.price}</p>
-        {enrolled ? (
-          <p className="mt-4 text-green-600 font-medium">You are enrolled in this course.</p>
-        ) : (
-          <form action={enroll}>
-            <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-              Enroll Now
-            </button>
-          </form>
-        )}
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Course Curriculum</h2>
-        {modules.map((m, i) => (
-          <details key={m.id} open={i === 0} className="mb-4">
-            <summary className="cursor-pointer py-2 px-4 bg-gray-100 rounded-lg font-medium">{m.title}</summary>
-            <div className="ml-6 mt-2">
-              {m.lessons.map((l) => (
-                <div key={l.id} className="py-2 border-b last:border-0 flex justify-between items-center">
-                  {enrolled || l.is_free_preview ? (
-                    <Link href={`/courses/${slug}/lessons/${l.id}`} className="text-blue-600 hover:underline">{l.title}</Link>
-                  ) : (
-                    <span className="text-gray-500">🔒 {l.title}</span>
-                  )}
-                  {l.is_free_preview && (
-                    <span className="px-2 py-1 text-xs text-white bg-green-500 rounded">Free Preview</span>
-                  )}
-                </div>
-              ))}
+    <div>
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_-10%,rgba(52,211,153,0.16),transparent_70%)]" />
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-[1fr_360px] lg:py-20">
+          <div>
+            <nav className="mb-6 flex items-center gap-2 text-sm text-zinc-500">
+              <Link href="/courses" className="transition hover:text-zinc-100">Courses</Link>
+              <span>/</span>
+              <span className="text-zinc-300">{course.title}</span>
+            </nav>
+            <h1 className="text-4xl sm:text-5xl">{course.title}</h1>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-400">{course.description}</p>
+            <div className="mt-6 flex items-center gap-4 text-sm text-zinc-400">
+              <span className="inline-flex items-center gap-1.5"><BookOpen size={16} /> {modules.length} modules</span>
+              <span className="inline-flex items-center gap-1.5"><PlayCircle size={16} /> {modules.reduce((n, m) => n + m.lessons.length, 0)} lessons</span>
             </div>
-          </details>
-        ))}
-      </div>
+          </div>
+
+          <div className="h-fit rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+            <p className="font-[family-name:var(--font-heading)] text-3xl font-bold tracking-[-0.02em]">
+              {Number(course.price) === 0 ? 'Free' : `$${course.price}`}
+            </p>
+            <div className="mt-5">
+              {enrolled ? (
+                <span className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-medium text-emerald-300">
+                  <CheckCircle2 size={16} /> Enrolled
+                </span>
+              ) : (
+                <form action={enroll}>
+                  <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(52,211,153,0.3)] transition hover:bg-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] active:scale-[0.98]">
+                    Enroll Now
+                  </button>
+                </form>
+              )}
+            </div>
+            <p className="mt-4 text-center text-xs text-zinc-500">Full lifetime access</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <h2 className="mb-6 text-2xl">Curriculum</h2>
+        <div className="space-y-4">
+          {modules.map((m, i) => (
+            <details key={m.id} open={i === 0} className="group overflow-hidden rounded-xl border border-white/10 bg-[#111113]">
+              <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-4 transition hover:bg-white/[0.03] [&::-webkit-details-marker]:hidden">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-[#18181B] text-sm font-semibold text-zinc-300">{i + 1}</span>
+                <span className="flex-1 font-medium">{m.title}</span>
+                <span className="text-xs text-zinc-500">{m.lessons.length} lessons</span>
+                <ChevronDown size={16} className="text-zinc-500 transition group-open:rotate-180" />
+              </summary>
+              <div className="divide-y divide-white/5 border-t border-white/10">
+                {m.lessons.map((l) => {
+                  const open = enrolled || l.is_free_preview;
+                  const row = (
+                    <>
+                      {open ? <PlayCircle size={18} className="shrink-0 text-emerald-400" /> : <Lock size={16} className="shrink-0 text-zinc-600" />}
+                      <span className={`flex-1 text-sm ${open ? 'text-zinc-100' : 'text-zinc-500'}`}>{l.title}</span>
+                      {l.is_free_preview && (
+                        <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.25)]">Free Preview</span>
+                      )}
+                    </>
+                  );
+                  return open ? (
+                    <Link key={l.id} href={`/courses/${slug}/lessons/${l.id}`} className="flex items-center gap-3 px-5 py-3.5 transition hover:bg-white/[0.04]">{row}</Link>
+                  ) : (
+                    <div key={l.id} className="flex items-center gap-3 px-5 py-3.5">{row}</div>
+                  );
+                })}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

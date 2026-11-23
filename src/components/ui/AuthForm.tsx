@@ -28,20 +28,26 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
   const login = mode === 'login'
   return (
-    <main className="mx-auto mt-24 max-w-sm p-4">
-      <h1 className="mb-4 text-2xl font-bold">{login ? 'Log in' : 'Sign up'}</h1>
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <input name="email" type="email" placeholder="Email" required className="rounded border p-2" />
-        <input name="password" type="password" placeholder="Password" minLength={6} required className="rounded border p-2" />
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {info && <p className="text-sm text-green-600">{info}</p>}
-        <button className="rounded bg-black p-2 text-white">{login ? 'Log in' : 'Sign up'}</button>
-      </form>
-      <p className="mt-4 text-sm">
-        <Link href={login ? '/signup' : '/login'} className="underline">
-          {login ? 'Need an account? Sign up' : 'Have an account? Log in'}
-        </Link>
-      </p>
-    </main>
+    <div className="relative">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_0%,rgba(52,211,153,0.12),transparent_70%)]" />
+      <div className="relative mx-auto max-w-md px-4 py-16 sm:py-24">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-8">
+          <h1 className="text-2xl">{login ? 'Welcome back' : 'Create your account'}</h1>
+          <p className="mb-6 mt-1 text-sm text-zinc-400">{login ? 'Log in to continue learning.' : 'Start learning in minutes.'}</p>
+          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+            <input name="email" type="email" placeholder="Email" required className="rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 transition focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20" />
+            <input name="password" type="password" placeholder="Password" minLength={6} required className="rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 transition focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20" />
+            {error && <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
+            {info && <p className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">{info}</p>}
+            <button className="rounded-full bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-[0.98]">{login ? 'Log in' : 'Sign up'}</button>
+          </form>
+          <p className="mt-6 text-center text-sm text-zinc-400">
+            <Link href={login ? '/signup' : '/login'} className="font-medium text-emerald-400 hover:text-emerald-300">
+              {login ? 'Need an account? Sign up' : 'Have an account? Log in'}
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }
