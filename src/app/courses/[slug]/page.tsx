@@ -4,19 +4,24 @@ import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getCurriculum } from '@/lib/curriculum';
 import { connection } from 'next/server';
+import { getT } from '@/lib/i18n/server';
+import { fmt, money, pick } from '@/lib/i18n/dict';
 export const instant = false
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   await connection();
   const { slug } = await params;
+  const { lang, t } = await getT();
   const supabase = await createClient();
 
   const { data: course } = await supabase
     .from('courses')
-    .select('id, title, description, price')
+    .select('id, title, title_bn, description, description_bn, price')
     .eq('slug', slug)
     .eq('published', true)
     .maybeSingle();
   if (!course) notFound();
+  const title = pick(lang, course.title, course.title_bn);
+  const paid = Number(course.price) > 0;
 
   const { data: { user } } = await supabase.auth.getUser();
   const [modules, enrollment] = await Promise.all([
@@ -32,7 +37,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
-    const { error } = await supabase.from('enrollments').insert({ user_id: user.id, course_id: course!.id });
+    const { error } = await supabase.from('enrollments').insert({ user_id: user.id, course_id: course!.id, source: 'free' });
     if (error && error.code !== '23505') throw new Error(error.message);
     redirect('/dashboard');
   }
@@ -44,49 +49,51 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-[1fr_360px] lg:py-20">
           <div>
             <nav className="mb-6 flex items-center gap-2 text-sm text-zinc-500">
-              <Link href="/courses" className="transition hover:text-zinc-100">Courses</Link>
+              <Link href="/courses" className="transition hover:text-zinc-100">{t.nav.courses}</Link>
               <span>/</span>
-              <span className="text-zinc-300">{course.title}</span>
+              <span className="text-zinc-300">{title}</span>
             </nav>
-            <h1 className="text-4xl sm:text-5xl">{course.title}</h1>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-400">{course.description}</p>
+            <h1 className="text-4xl leading-tight sm:text-5xl">{title}</h1>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-400">{pick(lang, course.description, course.description_bn)}</p>
             <div className="mt-6 flex items-center gap-4 text-sm text-zinc-400">
-              <span className="inline-flex items-center gap-1.5"><BookOpen size={16} /> {modules.length} modules</span>
-              <span className="inline-flex items-center gap-1.5"><PlayCircle size={16} /> {modules.reduce((n, m) => n + m.lessons.length, 0)} lessons</span>
+              <span className="inline-flex items-center gap-1.5"><BookOpen size={16} /> {fmt(t.course.modules, modules.length, lang)}</span>
+              <span className="inline-flex items-center gap-1.5"><PlayCircle size={16} /> {fmt(t.course.lessons, modules.reduce((n, m) => n + m.lessons.length, 0), lang)}</span>
             </div>
           </div>
 
           <div className="h-fit rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl">
             <p className="font-[family-name:var(--font-heading)] text-3xl font-bold tracking-[-0.02em]">
-              {Number(course.price) === 0 ? 'Free' : `$${course.price}`}
+              {paid ? money(course.price, lang) : t.card.free}
             </p>
             <div className="mt-5">
               {enrolled ? (
                 <span className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-medium text-emerald-300">
-                  <CheckCircle2 size={16} /> Enrolled
+                  <CheckCircle2 size={16} /> {t.course.enrolled}
                 </span>
+              ) : paid ? (
+                <span className="block rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-zinc-400">{t.course.paidSoon}</span>
               ) : (
                 <form action={enroll}>
                   <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(52,211,153,0.3)] transition hover:bg-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] active:scale-[0.98]">
-                    Enroll Now
+                    {t.course.enroll}
                   </button>
                 </form>
               )}
             </div>
-            <p className="mt-4 text-center text-xs text-zinc-500">Full lifetime access</p>
+            <p className="mt-4 text-center text-xs text-zinc-500">{t.course.lifetime}</p>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-12">
-        <h2 className="mb-6 text-2xl">Curriculum</h2>
+        <h2 className="mb-6 text-2xl">{t.course.curriculum}</h2>
         <div className="space-y-4">
           {modules.map((m, i) => (
             <details key={m.id} open={i === 0} className="group overflow-hidden rounded-xl border border-white/10 bg-[#111113]">
               <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-4 transition hover:bg-white/[0.03] [&::-webkit-details-marker]:hidden">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-[#18181B] text-sm font-semibold text-zinc-300">{i + 1}</span>
-                <span className="flex-1 font-medium">{m.title}</span>
-                <span className="text-xs text-zinc-500">{m.lessons.length} lessons</span>
+                <span className="flex-1 font-medium">{pick(lang, m.title, m.title_bn)}</span>
+                <span className="text-xs text-zinc-500">{fmt(t.course.lessons, m.lessons.length, lang)}</span>
                 <ChevronDown size={16} className="text-zinc-500 transition group-open:rotate-180" />
               </summary>
               <div className="divide-y divide-white/5 border-t border-white/10">
@@ -95,9 +102,9 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                   const row = (
                     <>
                       {open ? <PlayCircle size={18} className="shrink-0 text-emerald-400" /> : <Lock size={16} className="shrink-0 text-zinc-600" />}
-                      <span className={`flex-1 text-sm ${open ? 'text-zinc-100' : 'text-zinc-500'}`}>{l.title}</span>
+                      <span className={`flex-1 text-sm ${open ? 'text-zinc-100' : 'text-zinc-500'}`}>{pick(lang, l.title, l.title_bn)}</span>
                       {l.is_free_preview && (
-                        <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.25)]">Free Preview</span>
+                        <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.25)]">{t.course.freePreview}</span>
                       )}
                     </>
                   );

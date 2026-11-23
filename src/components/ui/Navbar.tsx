@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
+import { getT } from '@/lib/i18n/server';
+import { setLang } from '@/lib/i18n/actions';
+import HtmlLang from './HtmlLang';
 
 async function logout() {
   'use server';
@@ -14,6 +17,7 @@ const link = 'rounded-md px-3 py-2 text-zinc-400 transition hover:bg-white/5 hov
 
 export default async function Navbar() {
   await connection();
+  const { lang, t } = await getT();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -28,17 +32,21 @@ export default async function Navbar() {
           <span className="font-[family-name:var(--font-heading)] text-lg font-extrabold tracking-[-0.02em]">EduSite</span>
         </Link>
         <div className="flex items-center gap-1 text-sm font-medium">
-          <Link href="/" className={`hidden sm:block ${link}`}>Home</Link>
-          <Link href="/courses" className={link}>Courses</Link>
+          <HtmlLang lang={lang} />
+          <Link href="/" className={`hidden sm:block ${link}`}>{t.nav.home}</Link>
+          <Link href="/courses" className={link}>{t.nav.courses}</Link>
+          <form action={setLang.bind(null, lang === 'bn' ? 'en' : 'bn')}>
+            <button className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-zinc-300 transition hover:border-white/20 hover:text-zinc-100">{t.nav.switchTo}</button>
+          </form>
           {user ? (
             <>
-              <Link href="/dashboard" className={link}>Dashboard</Link>
+              <Link href="/dashboard" className={link}>{t.nav.dashboard}</Link>
               <form action={logout}>
-                <button className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">Logout</button>
+                <button className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">{t.nav.logout}</button>
               </form>
             </>
           ) : (
-            <Link href="/login" className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">Login/Signup</Link>
+            <Link href="/login" className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">{t.nav.login}</Link>
           )}
         </div>
       </div>

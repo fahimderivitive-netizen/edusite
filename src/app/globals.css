@@ -12,13 +12,13 @@ html {
 body {
   background: #09090b;
   color: #f4f4f5;
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-body), var(--font-bn), system-ui, sans-serif;
 }
 
 h1,
 h2,
 h3 {
-  font-family: var(--font-heading), system-ui, sans-serif;
+  font-family: var(--font-heading), var(--font-bn), system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
 }

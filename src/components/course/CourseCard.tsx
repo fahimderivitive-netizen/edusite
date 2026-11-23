@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Code2, Database, Palette } from 'lucide-react';
+import { dict, money, pick, type Lang } from '@/lib/i18n/dict';
 
 export type CourseSummary = {
   id: string;
   slug: string;
   title: string;
+  title_bn: string | null;
   description: string | null;
+  description_bn: string | null;
   price: number;
   category: string | null;
 };
@@ -29,7 +32,8 @@ export function CourseCover({ category, className = 'h-36' }: { category: string
   );
 }
 
-export default function CourseCard({ course }: { course: CourseSummary }) {
+export default function CourseCard({ course, lang }: { course: CourseSummary; lang: Lang }) {
+  const t = dict[lang];
   return (
     <Link
       href={`/courses/${course.slug}`}
@@ -39,16 +43,16 @@ export default function CourseCard({ course }: { course: CourseSummary }) {
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-3 flex items-center justify-between">
           {course.category ? (
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-medium capitalize text-zinc-300">{course.category}</span>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-medium capitalize text-zinc-300">{t.categories[course.category] ?? course.category}</span>
           ) : <span />}
           <span className="text-sm font-semibold text-emerald-400">
-            {Number(course.price) === 0 ? 'Free' : `$${course.price}`}
+            {Number(course.price) === 0 ? t.card.free : money(course.price, lang)}
           </span>
         </div>
-        <h3 className="mb-2 text-lg text-zinc-100">{course.title}</h3>
-        <p className="mb-5 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{course.description}</p>
+        <h3 className="mb-2 text-lg text-zinc-100">{pick(lang, course.title, course.title_bn)}</h3>
+        <p className="mb-5 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{pick(lang, course.description, course.description_bn)}</p>
         <span className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300 transition group-hover:text-emerald-400">
-          View course <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
+          {t.card.view} <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
         </span>
       </div>
     </Link>
