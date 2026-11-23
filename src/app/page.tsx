@@ -1,5 +1,19 @@
+import { connection } from 'next/server';
 import Link from 'next/link';
-export default function Home() {
+import { createClient } from '@/lib/supabase/server';
+import CourseCard from '@/components/course/CourseCard';
+export const instant = false;
+
+export default async function Home() {
+  await connection();
+  const supabase = await createClient();
+  const { data: courses } = await supabase
+    .from('courses')
+    .select('id, slug, title, description, price, category')
+    .eq('published', true)
+    .order('title')
+    .limit(3);
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero Section */}
@@ -11,21 +25,14 @@ export default function Home() {
 
       {/* Featured Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-semibold mb-2">Course Title {i}</h3>
-            <p className="text-gray-600 mb-4">Short description of course {i} content and learning outcomes.</p>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500">$99</span>
-              <Link href={`/courses/${i}`} className="text-blue-600 hover:underline">View Course</Link>
-            </div>
-          </div>
+        {(courses ?? []).map((c) => (
+          <CourseCard key={c.id} course={c} />
         ))}
       </div>
 
       {/* Footer */}
       <footer className="text-center text-gray-500 py-6">
-        <p>&copy; 2026 EduSite. All rights reserved.</p>
+        <p>&copy; EduSite. All rights reserved.</p>
       </footer>
     </div>
   );
