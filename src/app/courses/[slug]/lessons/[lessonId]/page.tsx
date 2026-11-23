@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurriculum } from '@/lib/curriculum';
 import { connection } from 'next/server';
 import { getT } from '@/lib/i18n/server';
+import LessonMedia from '@/components/lesson/LessonMedia';
+import Md from '@/components/Md';
 import { fmt, pick } from '@/lib/i18n/dict';
 export const instant = false
 
@@ -35,9 +37,12 @@ export default async function LessonPage({
   // RLS returns the row only for free previews or enrolled users.
   const { data: lesson } = await supabase
     .from('lessons')
-    .select('id, title, title_bn, video_url, content_md')
+    .select('id, title, title_bn, content_md')
     .eq('id', lessonId)
     .maybeSingle();
+  const { data: { user } } = await supabase.auth.getUser();
+  const phone = user ? (await supabase.from('profiles').select('phone').eq('id', user.id).maybeSingle()).data?.phone : null;
+  const mark = user ? [user.email, user.id.slice(0, 8), phone].filter(Boolean).join(' · ') : '';
 
   const prev = flat[index - 1];
   const next = flat[index + 1];
@@ -66,21 +71,19 @@ export default async function LessonPage({
             </div>
           ) : (
             <>
-              <div className="overflow-hidden rounded-xl bg-black ring-1 ring-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
-                {lesson.video_url ? (
-                  <video controls src={lesson.video_url} className="aspect-video w-full bg-black" />
-                ) : (
-                  <div className="flex aspect-video flex-col items-center justify-center gap-3 text-zinc-600">
-                    <PlayCircle size={18} className="h-14 w-14" strokeWidth={1} />
-                    <span className="text-sm">{t.lesson.noVideo}</span>
-                  </div>
-                )}
-              </div>
+              {user ? (
+                <LessonMedia key={lesson.id} lessonId={lesson.id} mark={mark} lang={lang} />
+              ) : (
+                <div className="flex aspect-video flex-col items-center justify-center gap-4 rounded-xl border border-white/10 bg-[#111113] text-center">
+                  <p className="text-zinc-400">{t.lesson.loginToWatch}</p>
+                  <Link href="/login" className="rounded-full bg-zinc-100 px-5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-white active:scale-95">{t.lesson.loginBtn}</Link>
+                </div>
+              )}
 
               <div className="mt-6 rounded-xl border border-white/10 bg-[#111113] p-6">
                 <h1 className="text-2xl sm:text-3xl">{pick(lang, lesson.title, lesson.title_bn)}</h1>
                 {lesson.content_md && (
-                  <div className="mt-4 whitespace-pre-wrap leading-relaxed text-zinc-400">{lesson.content_md}</div>
+                  <Md className="mt-4 leading-relaxed text-zinc-400">{lesson.content_md}</Md>
                 )}
               </div>
 

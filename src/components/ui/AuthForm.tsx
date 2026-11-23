@@ -17,11 +17,12 @@ export default function AuthForm({ mode, lang }: { mode: 'login' | 'signup'; lan
     const f = new FormData(e.currentTarget)
     const email = f.get('email') as string
     const password = f.get('password') as string
+    const phone = ((f.get('phone') as string | null) ?? '').trim()
     const supabase = createClient()
     const { data, error } =
       mode === 'login'
         ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password })
+        : await supabase.auth.signUp({ email, password, options: { data: { phone } } })
     if (error) return setError(error.message)
     if (mode === 'signup' && !data.session) return setInfo(t.checkEmail)
     router.push('/dashboard')
@@ -38,6 +39,7 @@ export default function AuthForm({ mode, lang }: { mode: 'login' | 'signup'; lan
           <p className="mb-6 mt-1 text-sm text-zinc-400">{login ? t.loginSub : t.signupSub}</p>
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <input name="email" type="email" placeholder={t.email} required className="rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 transition focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20" />
+            {!login && <input name="phone" type="tel" placeholder={t.phone} required pattern="(\+?88)?01[3-9][0-9]{8}" className="rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 transition focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20" />}
             <input name="password" type="password" placeholder={t.password} minLength={6} required className="rounded-lg border border-white/10 bg-[#111113] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 transition focus:border-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/20" />
             {error && <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
             {info && <p className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">{info}</p>}
