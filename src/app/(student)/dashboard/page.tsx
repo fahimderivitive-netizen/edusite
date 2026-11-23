@@ -13,7 +13,7 @@ export default async function Dashboard() {
 
   const { data: enrollments } = await supabase
     .from('enrollments')
-    .select('id, courses(slug, title, description)')
+    .select('id, courses(slug, title, description, category)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -33,7 +33,7 @@ export default async function Dashboard() {
                 href={`/courses/${c.slug}`}
                 className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#111113] transition duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
               >
-                <CourseCover category={null} className="h-28" />
+                <CourseCover category={c.category}className="h-28" />
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="mb-2 text-lg">{c.title}</h3>
                   <p className="mb-5 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{c.description}</p>
