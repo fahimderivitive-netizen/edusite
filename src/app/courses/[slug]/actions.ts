@@ -11,7 +11,7 @@ import { initSession, siteUrl, sslConfigured } from '@/lib/sslcommerz';
 
 export async function startPayment(fd: FormData) {
   const user = await requireUser();
-  const { course_id } = parse(z.object({ course_id: z.uuid() }), fd);
+  const { course_id } = parse(z.object({ course_id: z.guid() }), fd);
   if (!(await limit(`pay:${user.id}`, 5, 300))) throw new Error('Too many attempts. Please wait a few minutes.');
   if (!sslConfigured() || !hasServiceKey()) throw new Error('Online payment is not configured yet.');
 

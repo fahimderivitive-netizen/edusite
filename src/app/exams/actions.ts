@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
@@ -7,7 +7,7 @@ import { parse } from '@/lib/validate';
 
 export async function startExam(fd: FormData) {
   const user = await requireUser();
-  const { exam_id } = parse(z.object({ exam_id: z.uuid() }), fd);
+  const { exam_id } = parse(z.object({ exam_id: z.guid() }), fd);
   const supabase = await createClient();
   const { error } = await supabase.from('exam_attempts').insert({ exam_id, user_id: user.id });
   if (error && error.code !== '23505') throw new Error(error.message); // 23505: already started, just resume
@@ -15,9 +15,9 @@ export async function startExam(fd: FormData) {
 }
 
 const submission = z.object({
-  attemptId: z.uuid(),
-  examId: z.uuid(),
-  answers: z.record(z.uuid(), z.number().int().min(0).max(50)),
+  attemptId: z.guid(),
+  examId: z.guid(),
+  answers: z.record(z.guid(), z.number().int().min(0).max(50)),
   text: z.string().max(20000),
   path: z.string().max(300).nullable(),
 });

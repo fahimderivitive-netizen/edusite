@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -7,7 +7,7 @@ import { requireStaff, requireUser } from '@/lib/auth';
 import { parse, opt } from '@/lib/validate';
 import { limit } from '@/lib/ratelimit';
 
-const id = z.uuid();
+const id = z.guid();
 const fail = (e: { message: string } | null) => { if (e) throw new Error(e.message); };
 const ownPath = (uid: string, p: string | null) => {
   if (p && !p.startsWith(`${uid}/`)) throw new Error('Invalid file path');

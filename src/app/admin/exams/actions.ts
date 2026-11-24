@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireStaff } from '@/lib/auth';
 import { parse, opt, bool, int } from '@/lib/validate';
 
-const id = z.uuid();
+const id = z.guid();
 const fail = (e: { message: string } | null) => { if (e) throw new Error(e.message); };
 const examFields = {
   course_id: id,
