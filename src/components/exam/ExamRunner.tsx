@@ -19,6 +19,7 @@ export default function ExamRunner({ attemptId, examId, userId, kind, questions,
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
+  const [sure, setSure] = useState(false);
   const sent = useRef(false);
   const sendRef = useRef<() => void>(() => {});
   const leftRef = useRef(remainingSec);
@@ -68,13 +69,27 @@ export default function ExamRunner({ attemptId, examId, userId, kind, questions,
       <div className="sticky top-16 z-40 -mx-4 mb-6 flex items-center justify-between border-b border-white/10 bg-[#09090B]/90 px-4 py-3 backdrop-blur-md">
         <span className="text-sm text-zinc-400">{t.timeLeft}</span>
         <span className={`font-mono text-xl font-semibold tabular-nums ${left < 60 ? 'text-red-400' : 'text-emerald-400'}`}>{clock(left)}</span>
-        <button
-          disabled={pending}
-          onClick={() => { if (confirm(t.confirm)) send(); }}
-          className="rounded-full bg-zinc-100 px-5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-white active:scale-95 disabled:opacity-50"
-        >
-          {t.submit}
-        </button>
+        {sure ? (
+          <div className="flex items-center gap-2">
+            <span className="hidden text-sm text-zinc-300 sm:inline">{t.confirm}</span>
+            <button
+              disabled={pending}
+              onClick={send}
+              className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-300 active:scale-95 disabled:opacity-50"
+            >
+              {t.submit}
+            </button>
+            <button onClick={() => setSure(false)} aria-label="Cancel" className="px-2 text-zinc-400 hover:text-zinc-100">✕</button>
+          </div>
+        ) : (
+          <button
+            disabled={pending}
+            onClick={() => setSure(true)}
+            className="rounded-full bg-zinc-100 px-5 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-white active:scale-95 disabled:opacity-50"
+          >
+            {t.submit}
+          </button>
+        )}
       </div>
 
       <div className="space-y-6">
