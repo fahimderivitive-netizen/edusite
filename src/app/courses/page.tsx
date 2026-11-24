@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import CourseList from '@/components/course/CourseList';
 import { connection } from 'next/server';
 import { getT } from '@/lib/i18n/server';
+export const instant = false;
 
 export default async function Courses() {
   await connection();
