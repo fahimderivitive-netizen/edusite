@@ -1,6 +1,7 @@
-# EduSite setup checklist (Phases 1–6)
+﻿# Quark of Education setup checklist (Phases 1–6)
 
-All code is on branch `feature/platform`. `main` is untouched. Merge only after you finish the steps below.
+The code is on `main` and deploys to Vercel automatically on every push. (`feature/platform` is the older working branch.)
+Brand: Quark of Education. Logo files live in `public/` (`logo-mark.png`, `logo-full.png`) and `src/app/` (`icon.png`, `apple-icon.png`, `opengraph-image.png`).
 
 ## 1. Run the SQL (Supabase → SQL Editor), in this order
 

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
@@ -46,12 +47,9 @@ export default async function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09090B]/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5">
-          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
-            <rect x="1" y="1" width="24" height="24" rx="7" className="fill-emerald-400/10 stroke-emerald-400/60" />
-            <path d="M8 17V9l5 3.5L18 9v8" className="stroke-emerald-300" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span className="font-[family-name:var(--font-heading)] text-lg font-extrabold tracking-[-0.02em]">EduSite</span>
+        <Link href="/" className="flex items-center gap-2.5" aria-label="Quark of Education">
+          <Image src="/logo-mark.png" alt="" width={392} height={137} priority className="h-7 w-auto sm:h-8" />
+          <span className="font-[family-name:var(--font-heading)] text-sm font-extrabold tracking-[-0.02em] sm:text-lg">Quark of Education</span>
         </Link>
 
         <div className="flex items-center gap-1 text-sm font-medium">

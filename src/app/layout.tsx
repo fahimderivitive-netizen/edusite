@@ -24,8 +24,11 @@ const bangla = Hind_Siliguri({
 });
 
 export const metadata: Metadata = {
-  title: "EduSite — Online Courses",
-  description: "Learn new skills with high-quality online courses from expert instructors.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  title: { default: "Quark of Education — Online Courses", template: "%s | Quark of Education" },
+  description: "Dedicated to excellence. High-quality online courses from Quark of Education.",
+  applicationName: "Quark of Education",
+  openGraph: { siteName: "Quark of Education", type: "website", locale: "bn_BD" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

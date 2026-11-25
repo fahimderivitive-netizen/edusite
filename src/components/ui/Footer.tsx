@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getT } from '@/lib/i18n/server';
 
+export const YOUTUBE_URL = 'https://www.youtube.com/@quarkofeducation';
+
 export default async function Footer() {
   const { t } = await getT();
   const links = [
@@ -9,12 +11,17 @@ export default async function Footer() {
     { href: '/refund', label: t.footer.refund },
     { href: '/support', label: t.footer.support },
   ];
+  const linkCls = 'transition hover:text-zinc-200';
   return (
     <footer className="border-t border-white/10">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-zinc-500 sm:flex-row">
-        <span>&copy; EduSite</span>
+        <span className="text-center sm:text-left">
+          &copy; Quark of Education
+          <span className="block text-xs italic text-zinc-600">Dedicated to excellence</span>
+        </span>
         <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2">
-          {links.map((l) => <Link key={l.href} href={l.href} className="transition hover:text-zinc-200">{l.label}</Link>)}
+          {links.map((l) => <Link key={l.href} href={l.href} className={linkCls}>{l.label}</Link>)}
+          <a href={YOUTUBE_URL} target="_blank" rel="noopener noreferrer" className={linkCls}>YouTube</a>
         </nav>
       </div>
     </footer>

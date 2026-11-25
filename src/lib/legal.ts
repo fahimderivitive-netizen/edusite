@@ -8,9 +8,9 @@ export const legal: Record<LegalKey, Record<Lang, LegalDoc>> = {
     en: {
       title: 'Terms of Service',
       sections: [
-        { h: 'Using EduSite', p: 'By creating an account you agree to these terms. Give accurate information and keep your password private.' },
+        { h: 'Using Quark of Education', p: 'By creating an account you agree to these terms. Give accurate information and keep your password private.' },
         { h: 'Your account is personal', p: 'Your account is for you alone. Sharing your login, or letting others watch with your account, is not allowed. We limit the number of devices per account and mark videos and PDFs with your identity.' },
-        { h: 'Course content', p: 'Videos, notes, PDFs and exams belong to EduSite and its instructors. You may use them for your own learning. Do not copy, record, download, resell or share them.' },
+        { h: 'Course content', p: 'Videos, notes, PDFs and exams belong to Quark of Education and its instructors. You may use them for your own learning. Do not copy, record, download, resell or share them.' },
         { h: 'Payments', p: 'Paid courses are paid in Bangladeshi Taka (BDT) through SSLCommerz (bKash, Nagad, Rocket and cards). Access starts after we confirm your payment.' },
         { h: 'Conduct', p: 'Be respectful in comments, doubts and support tickets. We may remove content or suspend accounts that break these rules.' },
         { h: 'Changes and contact', p: 'We may update these terms. Continuing to use the site means you accept the updated terms. For questions, open a ticket on the Support page.' },
@@ -19,9 +19,9 @@ export const legal: Record<LegalKey, Record<Lang, LegalDoc>> = {
     bn: {
       title: 'সেবার শর্তাবলি',
       sections: [
-        { h: 'EduSite ব্যবহার', p: 'অ্যাকাউন্ট খোলার মাধ্যমে আপনি এই শর্তাবলি মেনে নিচ্ছেন। সঠিক তথ্য দিন এবং পাসওয়ার্ড গোপন রাখুন।' },
+        { h: 'Quark of Education ব্যবহার', p: 'অ্যাকাউন্ট খোলার মাধ্যমে আপনি এই শর্তাবলি মেনে নিচ্ছেন। সঠিক তথ্য দিন এবং পাসওয়ার্ড গোপন রাখুন।' },
         { h: 'অ্যাকাউন্ট ব্যক্তিগত', p: 'আপনার অ্যাকাউন্ট শুধু আপনার জন্য। লগইন শেয়ার করা বা অন্যকে আপনার অ্যাকাউন্টে কোর্স দেখতে দেওয়া নিষেধ। প্রতিটি অ্যাকাউন্টে ডিভাইসের সংখ্যা সীমিত, এবং ভিডিও ও PDF-এ আপনার পরিচয় ওয়াটারমার্ক হিসেবে দেখানো হয়।' },
-        { h: 'কোর্সের কনটেন্ট', p: 'ভিডিও, নোট, PDF ও পরীক্ষা EduSite ও শিক্ষকদের সম্পত্তি। নিজের পড়ার জন্য ব্যবহার করতে পারবেন। কপি, রেকর্ড, ডাউনলোড, বিক্রি বা শেয়ার করা যাবে না।' },
+        { h: 'কোর্সের কনটেন্ট', p: 'ভিডিও, নোট, PDF ও পরীক্ষা Quark of Education ও শিক্ষকদের সম্পত্তি। নিজের পড়ার জন্য ব্যবহার করতে পারবেন। কপি, রেকর্ড, ডাউনলোড, বিক্রি বা শেয়ার করা যাবে না।' },
         { h: 'পেমেন্ট', p: 'পেইড কোর্সের মূল্য বাংলাদেশি টাকায় (BDT) SSLCommerz-এর মাধ্যমে (বিকাশ, নগদ, রকেট ও কার্ড) দিতে হয়। পেমেন্ট নিশ্চিত হওয়ার পরই কোর্সে প্রবেশাধিকার শুরু হয়।' },
         { h: 'আচরণ', p: 'কমেন্ট, ডাউট ও সাপোর্ট টিকেটে ভদ্র আচরণ করুন। নিয়ম ভাঙলে আমরা কনটেন্ট সরিয়ে দিতে বা অ্যাকাউন্ট স্থগিত করতে পারি।' },
         { h: 'পরিবর্তন ও যোগাযোগ', p: 'আমরা এই শর্তাবলি হালনাগাদ করতে পারি; সাইট ব্যবহার চালিয়ে গেলে নতুন শর্ত মেনে নেওয়া হয়েছে ধরা হবে। প্রশ্ন থাকলে সাপোর্ট পাতায় টিকেট খুলুন।' },
