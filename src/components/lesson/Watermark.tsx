@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 // Still corner mark that hops to the next corner every 30 s, so it is unobtrusive but not croppable from one spot.
 // data-wm is checked by the player's tamper guard. Bottom corners sit above the player's control bar.
-const CORNERS = ['right-3 top-3 text-right', 'left-3 top-3 text-left', 'left-3 bottom-14 text-left', 'right-3 bottom-14 text-right'];
+const CORNERS = ['right-5 top-3 text-right', 'left-3 top-3 text-left', 'left-3 bottom-14 text-left', 'right-5 bottom-14 text-right'];
 
 export default function Watermark({ text }: { text: string }) {
   const [i, setI] = useState(0);
