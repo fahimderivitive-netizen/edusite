@@ -4,6 +4,8 @@ import { ArrowRight, PlayCircle, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import CourseCard from '@/components/course/CourseCard';
 import { getT } from '@/lib/i18n/server';
+import { Suspense } from 'react';
+import YouTubeStrip from '@/components/home/YouTubeStrip';
 export const instant = false;
 
 export default async function Home() {
@@ -63,6 +65,10 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <Suspense fallback={null}>
+        <YouTubeStrip lang={lang} />
+      </Suspense>
     </div>
   );
 }

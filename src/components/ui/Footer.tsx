@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { getT } from '@/lib/i18n/server';
-
-export const YOUTUBE_URL = 'https://www.youtube.com/@quarkofeducation';
+import { YOUTUBE_URL } from '@/lib/youtube';
 
 export default async function Footer() {
   const { t } = await getT();

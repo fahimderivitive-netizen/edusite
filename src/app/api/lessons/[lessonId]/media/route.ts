@@ -4,6 +4,7 @@ import { createAdminClient, hasServiceKey } from '@/lib/supabase/admin';
 import { ensureDevice } from '@/lib/device';
 import { limit } from '@/lib/ratelimit';
 import { signVideo } from '@/lib/media';
+import { parseYouTubeId } from '@/lib/youtube';
 
 const json = (body: object, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 
@@ -15,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ les
   if (!(await limit(`media:${user.id}`, 60, 60))) return json({ error: 'rate_limited' }, 429);
 
   // RLS is the access check: a row comes back only for free previews, enrolled students and content staff.
-  const { data: lesson } = await supabase.from('lessons').select('id').eq('id', lessonId).maybeSingle();
+  const { data: lesson } = await supabase.from('lessons').select('id, is_free_preview').eq('id', lessonId).maybeSingle();
   if (!lesson) return json({ error: 'forbidden' }, 403);
   if (!hasServiceKey()) return json({ error: 'not_configured' }, 503);
 
@@ -29,8 +30,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ les
     return json({ error: 'server_error' }, 500);
   }
 
-  let video = null;
-  if (m?.video_id) {
+  let video: ReturnType<typeof signVideo> | { kind: 'youtube'; id: string } | null = null;
+  const yt = parseYouTubeId(m?.video_id);
+  if (yt) {
+    // YouTube has no signed links: anyone with the id can watch. Only ever serve it for free previews.
+    if (!lesson.is_free_preview) return json({ error: 'youtube_paid_blocked' }, 403);
+    video = { kind: 'youtube', id: yt };
+  } else if (m?.video_id) {
     try {
       video = signVideo(m.video_id);
     } catch (e) {

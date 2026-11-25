@@ -7,6 +7,7 @@ import { requireStaff, requireAdmin } from '@/lib/auth';
 import { parse, opt, bool, int } from '@/lib/validate';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { settle, type Pay } from '@/lib/payments';
+import { parseYouTubeId } from '@/lib/youtube';
 
 const id = z.guid();
 const slug = z.string().trim().toLowerCase().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug: lowercase letters, numbers and dashes only');
@@ -60,6 +61,8 @@ export async function saveLesson(fd: FormData) {
     position: int, duration_min: z.coerce.number().min(0).default(0),
     is_free_preview: bool, content_md: opt, video_id: opt, remove_pdf: bool,
   }), fd);
+  if (parseYouTubeId(v.video_id) && !v.is_free_preview)
+    throw new Error('YouTube videos can only be used on free preview lessons (they cannot be protected). Tick "Free preview", or use a Bunny video ID for paid lessons.');
   const supabase = await createClient();
 
   const row = {

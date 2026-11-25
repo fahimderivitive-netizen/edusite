@@ -134,7 +134,7 @@ function LessonForm({ moduleId, courseId, lesson, videoId = '', hasPdf = false }
       </Field>
       <Field label="Order"><input name="position" type="number" min="0" defaultValue={lesson?.position ?? 0} className={input} /></Field>
       <Field label="Duration (minutes)"><input name="duration_min" type="number" min="0" step="0.5" defaultValue={lesson?.duration_sec ? lesson.duration_sec / 60 : 0} className={input} /></Field>
-      <Field label="Bunny video ID (GUID)"><input name="video_id" defaultValue={videoId} placeholder="e.g. 3f2c…" className={input} /></Field>
+      <Field label="Video: Bunny ID, or YouTube link (free previews only)"><input name="video_id" defaultValue={videoId} placeholder="e.g. 3f2c… or https://youtu.be/…" className={input} /></Field>
       <Field label={hasPdf ? 'Replace PDF (25 MB max)' : 'PDF (25 MB max)'}><input name="pdf" type="file" accept="application/pdf" className={input} /></Field>
       <div className="flex items-end gap-4 pb-2 text-sm text-zinc-300">
         <label className="flex items-center gap-2"><input type="checkbox" name="is_free_preview" defaultChecked={lesson?.is_free_preview} className="h-4 w-4 accent-emerald-400" /> Free preview</label>

@@ -11,6 +11,8 @@ const en = {
     start: 'Start for free',
     featured: 'Featured courses',
     viewAll: 'View all',
+    youtube: 'Latest from our YouTube channel',
+    visitChannel: 'Visit channel',
   },
   courses: {
     title: 'Course Catalog',
@@ -180,6 +182,8 @@ const bn: Dict = {
     start: 'ফ্রিতে শুরু করো',
     featured: 'নির্বাচিত কোর্স',
     viewAll: 'সব দেখো',
+    youtube: 'আমাদের ইউটিউব চ্যানেলের সাম্প্রতিক ভিডিও',
+    visitChannel: 'চ্যানেলে যাও',
   },
   courses: {
     title: 'কোর্স ক্যাটালগ',

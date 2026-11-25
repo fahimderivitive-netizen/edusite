@@ -55,6 +55,12 @@ In Supabase → **Authentication → URL Configuration**:
 Supabase's built-in email sender allows only a few emails per hour. Before real students sign up, add a custom SMTP
 provider under **Authentication → SMTP Settings** (Brevo, Resend, etc.).
 
+## 5b. YouTube and region
+
+- **Home page strip:** shows the 3 latest uploads of the channel (`src/lib/youtube.ts`, channel id `UCi0x9DOPGzUDzDaFAeqke-Q`), refreshed hourly.
+- **YouTube lessons:** paste a YouTube link into a lesson's video field. Only allowed on **Free preview** lessons (YouTube links cannot be protected), enforced both when saving and when serving. Paid lessons use Bunny.
+- **Server region:** `vercel.json` pins Vercel functions to Mumbai (`bom1`), next to the Supabase project in Mumbai.
+
 ## 6. Not verified yet (needs your live accounts)
 
 - ~~Bunny token signing~~ verified against a real Bunny library (2026-11-26): signed HLS plays, the quality menu lists 240p–1080p and switching works, and the same playlist URL without a token returns 403. Still to do before launch: in Bunny's library security settings add your real domain under allowed domains/referrers.

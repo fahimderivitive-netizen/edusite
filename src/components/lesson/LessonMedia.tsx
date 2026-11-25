@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react';
 import { Lock, PlayCircle } from 'lucide-react';
 import VideoPlayer, { type VideoSrc } from './VideoPlayer';
 import PdfViewer from './PdfViewer';
+import YouTubeEmbed from './YouTubeEmbed';
 import { dict, type Lang } from '@/lib/i18n/dict';
 
 type State =
   | { status: 'loading' }
-  | { status: 'ok'; video: VideoSrc | null; pdfUrl: string | null }
+  | { status: 'ok'; video: VideoSrc | { kind: 'youtube'; id: string } | null; pdfUrl: string | null }
   | { status: 'error'; code: string };
 
 export default function LessonMedia({ lessonId, mark, lang }: { lessonId: string; mark: string; lang: Lang }) {
@@ -54,7 +55,11 @@ export default function LessonMedia({ lessonId, mark, lang }: { lessonId: string
     );
   return (
     <div className="space-y-6">
-      {state.video && <VideoPlayer video={state.video} mark={mark} lang={lang} />}
+      {state.video?.kind === 'youtube' ? (
+        <YouTubeEmbed id={state.video.id} mark={mark} title={t.pdf} />
+      ) : (
+        state.video && <VideoPlayer video={state.video} mark={mark} lang={lang} />
+      )}
       {state.pdfUrl && (
         <div>
           <p className="mb-2 text-sm font-medium text-zinc-300">{t.pdf}</p>
