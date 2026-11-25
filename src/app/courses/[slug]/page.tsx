@@ -47,9 +47,9 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
 
   return (
     <div>
-      {(pay === 'success' || pay === 'fail' || pay === 'cancel') && (
+      {(pay === 'success' || pay === 'review' || pay === 'fail' || pay === 'cancel') && (
         <p className={`px-4 py-3 text-center text-sm ${pay === 'success' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-200'}`}>
-          {pay === 'success' ? t.course.payOk : pay === 'fail' ? t.course.payFail : t.course.payCancel}
+          {pay === 'success' ? t.course.payOk : pay === 'review' ? t.course.payReview : pay === 'fail' ? t.course.payFail : t.course.payCancel}
         </p>
       )}
       <section className="relative overflow-hidden border-b border-white/10">

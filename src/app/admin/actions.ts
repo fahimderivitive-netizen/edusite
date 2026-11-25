@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { requireStaff, requireAdmin } from '@/lib/auth';
 import { parse, opt, bool, int } from '@/lib/validate';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { settle, type Pay } from '@/lib/payments';
 
 const id = z.guid();
 const slug = z.string().trim().toLowerCase().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug: lowercase letters, numbers and dashes only');
@@ -121,6 +123,20 @@ export async function enrollUser(fd: FormData) {
   const { error } = await supabase.from('enrollments').insert({ ...v, source: 'admin' });
   if (error && error.code !== '23505') throw new Error(error.message);
   revalidatePath('/admin/users');
+}
+
+// Approves a payment the gateway confirmed but flagged high-risk. The gateway is asked again before enrolling.
+export async function approvePayment(fd: FormData) {
+  await requireAdmin();
+  const v = parse(z.object({ id }), fd);
+  const admin = createAdminClient();
+  const { data: pay } = await admin.from('payments').select('id, tran_id, user_id, course_id, amount, status, gateway_payload').eq('id', v.id).maybeSingle();
+  if (!pay || pay.status !== 'pending') throw new Error('This payment is not waiting for review');
+  const valId = (pay.gateway_payload as { val_id?: string } | null)?.val_id;
+  if (!valId) throw new Error('No gateway confirmation on file for this payment');
+  const result = await settle(pay as Pay, { val_id: valId }, { skipRisk: true });
+  if (result !== 'paid') throw new Error('The gateway no longer confirms this payment');
+  revalidatePath('/admin/payments');
 }
 
 export async function revokeEnrollment(fd: FormData) {

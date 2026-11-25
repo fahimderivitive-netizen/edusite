@@ -35,6 +35,7 @@ const en = {
     payOk: 'Payment successful. You are enrolled.',
     payFail: 'Payment could not be verified. You were not charged, or it is under review.',
     payCancel: 'Payment cancelled.',
+    payReview: 'Your payment was received and is in a quick security review. Access will be granted shortly. If it takes more than 24 hours, contact Support.',
   },
   lesson: {
     locked: 'This lesson is locked. Enroll in the course to unlock it.',
@@ -201,6 +202,7 @@ const bn: Dict = {
     payOk: 'পেমেন্ট সফল হয়েছে। তুমি এনরোল হয়েছ।',
     payFail: 'পেমেন্ট যাচাই করা যায়নি। টাকা কাটা না হলে চিন্তার কিছু নেই, অথবা এটি পর্যালোচনায় আছে।',
     payCancel: 'পেমেন্ট বাতিল করা হয়েছে।',
+    payReview: 'তোমার পেমেন্ট পাওয়া গেছে এবং দ্রুত নিরাপত্তা যাচাই চলছে। শীঘ্রই কোর্সে প্রবেশাধিকার পাবে। ২৪ ঘণ্টার বেশি লাগলে সাপোর্টে জানাও।',
   },
   lesson: {
     locked: 'এই লেসনটি লক করা। আনলক করতে কোর্সে এনরোল করো।',
