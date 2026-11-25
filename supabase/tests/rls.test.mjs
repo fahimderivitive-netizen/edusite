@@ -5,7 +5,7 @@ const db = new PGlite();
 const sql = (f) => readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
 
 await db.exec(`
-  create role anon nologin; create role authenticated nologin;
+  create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
   create schema auth;
   create table auth.users (id uuid primary key default gen_random_uuid(), email text, raw_user_meta_data jsonb);
   create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
@@ -20,12 +20,12 @@ await db.exec(`
   grant execute on function storage.foldername(text) to anon, authenticated;
 `);
 
-for (const f of ['schema.sql', 'policies.sql', 'phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql']) {
+for (const f of ['schema.sql', 'policies.sql', 'phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql', 'phase8.sql']) {
   try { await db.exec(sql(f)); console.log('loaded', f); }
   catch (e) { console.log('FAILED to load', f, '->', e.message); process.exit(1); }
 }
 // second pass proves idempotency
-for (const f of ['phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql']) {
+for (const f of ['phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql', 'phase8.sql']) {
   try { await db.exec(sql(f)); } catch (e) { console.log('NOT IDEMPOTENT', f, '->', e.message); }
 }
 console.log('re-ran phases 1-6 (idempotency check) done');
@@ -155,6 +155,13 @@ await t('admin can change a role', () => q(`update profiles set role='moderator'
 await as(null);
 await t('SQL editor / service role can still change roles', () => q(`update profiles set role='student' where id=$1`, [ids.s2]));
 await as('s1');
+
+console.log('\n--- server key (phase 8) ---');
+await db.exec('reset role'); await db.exec('set role service_role');
+await t('service_role can read lesson_media', async () => { if (!(await q(`select * from lesson_media`)).length) throw new Error('empty'); });
+await t('service_role can register a device session', () => q(`insert into user_sessions (user_id, device_id) values ($1, 'dev1')`, [ids.s1]));
+await t('service_role can record a payment', () => q(`insert into payments (tran_id,user_id,course_id,amount) values ('T1',$1,$2,100)`, [ids.s1, course]));
+await db.exec('reset role');
 
 await as(null);
 console.log(`\n${pass} passed, ${failN} failed`);

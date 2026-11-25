@@ -20,3 +20,4 @@ begin
 end $$;
 drop trigger if exists profiles_guard on profiles;
 create trigger profiles_guard before update on profiles for each row execute function guard_profile_privileges();
+

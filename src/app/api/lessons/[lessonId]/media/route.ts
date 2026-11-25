@@ -23,7 +23,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ les
   if (me?.role === 'student' && (await ensureDevice(user.id)) === 'revoked') return json({ error: 'device_limit' }, 403);
 
   const admin = createAdminClient();
-  const { data: m } = await admin.from('lesson_media').select('video_id, pdf_path').eq('lesson_id', lessonId).maybeSingle();
+  const { data: m, error: mediaErr } = await admin.from('lesson_media').select('video_id, pdf_path').eq('lesson_id', lessonId).maybeSingle();
+  if (mediaErr) {
+    console.error('lesson_media read failed:', mediaErr.message);
+    return json({ error: 'server_error' }, 500);
+  }
 
   let video = null;
   if (m?.video_id) {

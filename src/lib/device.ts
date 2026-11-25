@@ -25,14 +25,16 @@ async function enforce(userId: string) {
 export async function ensureDevice(userId: string): Promise<'ok' | 'revoked'> {
   const did = await deviceId();
   const a = createAdminClient();
-  const { data: row } = await a.from('user_sessions').select('id, revoked').eq('user_id', userId).eq('device_id', did).maybeSingle();
+  const { data: row, error } = await a.from('user_sessions').select('id, revoked').eq('user_id', userId).eq('device_id', did).maybeSingle();
+  if (error) throw new Error(`device check failed: ${error.message}`);
   if (row?.revoked) return 'revoked';
   if (row) {
     await a.from('user_sessions').update({ last_seen: new Date().toISOString() }).eq('id', row.id);
     return 'ok';
   }
   const ua = (await headers()).get('user-agent') ?? '';
-  await a.from('user_sessions').insert({ user_id: userId, device_id: did, label: ua.slice(0, 120) });
+  const { error: insErr } = await a.from('user_sessions').insert({ user_id: userId, device_id: did, label: ua.slice(0, 120) });
+  if (insErr) throw new Error(`device register failed: ${insErr.message}`);
   await enforce(userId);
   return 'ok';
 }

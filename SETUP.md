@@ -13,6 +13,7 @@ All code is on branch `feature/platform`. `main` is untouched. Merge only after 
 5. `supabase/phase5.sql` – exams
 6. `supabase/phase6.sql` – progress, comments, doubts, tickets, bucket limits
 7. `supabase/phase7.sql` – self-service profile edits (name, phone) with a guard that blocks role changes
+8. `supabase/phase8.sql` – grants the server (service_role) key access to the tables it uses; without it, video, device limit and payments fail with "permission denied"
 
 All files are idempotent (safe to re-run). `npm run test:sql` replays them in an in-memory Postgres and checks the
 security rules (paid-course lockout, hidden answer keys, grading, privacy between students).
