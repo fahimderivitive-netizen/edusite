@@ -20,7 +20,7 @@ export default async function Home() {
   return (
     <div>
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(52,211,153,0.18),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(92,225,230,0.18),transparent_70%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]" />
         <div className="relative mx-auto max-w-4xl px-4 py-24 text-center sm:py-32">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
@@ -28,7 +28,7 @@ export default async function Home() {
           </span>
           <h1 className="mt-6 text-5xl leading-tight sm:text-7xl">
             {t.home.h1a}<br />
-            <span className="bg-gradient-to-r from-emerald-300 to-cyan-400 bg-clip-text text-transparent">{t.home.h1b}</span>
+            <span className="bg-gradient-to-r from-emerald-300 to-[#c86ee0] bg-clip-text text-transparent">{t.home.h1b}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400">
             {t.home.sub}

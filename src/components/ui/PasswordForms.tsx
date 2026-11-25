@@ -11,7 +11,7 @@ const submit = 'rounded-full bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-
 function Shell({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
     <div className="relative">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_0%,rgba(52,211,153,0.12),transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_0%,rgba(92,225,230,0.12),transparent_70%)]" />
       <div className="relative mx-auto max-w-md px-4 py-16 sm:py-24">
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-8">
           <h1 className="text-2xl">{title}</h1>

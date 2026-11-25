@@ -109,7 +109,7 @@ export default async function LessonPage({
                   </Link>
                 ) : <span />}
                 {next && (
-                  <Link href={`/courses/${slug}/lessons/${next.id}`} className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-[0_0_20px_rgba(52,211,153,0.25)] transition hover:bg-emerald-300 active:scale-95">
+                  <Link href={`/courses/${slug}/lessons/${next.id}`} className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-[0_0_20px_rgba(92,225,230,0.25)] transition hover:bg-emerald-300 active:scale-95">
                     {t.lesson.next} <ArrowRight size={16} />
                   </Link>
                 )}

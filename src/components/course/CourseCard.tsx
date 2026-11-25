@@ -15,7 +15,7 @@ export type CourseSummary = {
 
 const covers: Record<string, { bg: string; text: string; Icon: typeof Code2 }> = {
   development: { bg: 'from-emerald-500/25 via-emerald-950/40 to-[#111113]', text: 'text-emerald-300', Icon: Code2 },
-  data: { bg: 'from-cyan-500/25 via-cyan-950/40 to-[#111113]', text: 'text-cyan-300', Icon: Database },
+  data: { bg: 'from-amber-400/25 via-amber-950/40 to-[#111113]', text: 'text-amber-300', Icon: Database },
   design: { bg: 'from-fuchsia-500/25 via-fuchsia-950/40 to-[#111113]', text: 'text-fuchsia-300', Icon: Palette },
 };
 const fallback = { bg: 'from-zinc-500/25 via-zinc-900/40 to-[#111113]', text: 'text-zinc-300', Icon: BookOpen };

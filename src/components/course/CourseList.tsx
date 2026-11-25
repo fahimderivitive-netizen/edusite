@@ -26,7 +26,7 @@ export default function CourseList({ courses, lang }: { courses: CourseSummary[]
               onClick={() => setCategory(c)}
               className={`rounded-full border px-4 py-1.5 text-sm font-medium capitalize transition ${
                 category === c
-                  ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300 shadow-[0_0_16px_rgba(52,211,153,0.15)]'
+                  ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300 shadow-[0_0_16px_rgba(92,225,230,0.15)]'
                   : 'border-white/10 bg-[#111113] text-zinc-400 hover:border-white/20 hover:text-zinc-100'
               }`}
             >

@@ -53,7 +53,7 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
         </p>
       )}
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_-10%,rgba(52,211,153,0.16),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_-10%,rgba(92,225,230,0.16),transparent_70%)]" />
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-[1fr_360px] lg:py-20">
           <div>
             <nav className="mb-6 flex items-center gap-2 text-sm text-zinc-500">
@@ -82,7 +82,7 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
                 sslConfigured() ? (
                   <form action={startPayment}>
                     <input type="hidden" name="course_id" value={course.id} />
-                    <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(52,211,153,0.3)] transition hover:bg-emerald-300 active:scale-[0.98]">
+                    <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(92,225,230,0.3)] transition hover:bg-emerald-300 active:scale-[0.98]">
                       {t.course.buy} · {money(course.price, lang)}
                     </button>
                   </form>
@@ -91,7 +91,7 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
                 )
               ) : (
                 <form action={enroll}>
-                  <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(52,211,153,0.3)] transition hover:bg-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] active:scale-[0.98]">
+                  <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(92,225,230,0.3)] transition hover:bg-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09090B] active:scale-[0.98]">
                     {t.course.enroll}
                   </button>
                 </form>
@@ -121,7 +121,7 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
                       {open ? <PlayCircle size={18} className="shrink-0 text-emerald-400" /> : <Lock size={16} className="shrink-0 text-zinc-600" />}
                       <span className={`flex-1 text-sm ${open ? 'text-zinc-100' : 'text-zinc-500'}`}>{pick(lang, l.title, l.title_bn)}</span>
                       {l.is_free_preview && (
-                        <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.25)]">{t.course.freePreview}</span>
+                        <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300 shadow-[0_0_12px_rgba(92,225,230,0.25)]">{t.course.freePreview}</span>
                       )}
                     </>
                   );

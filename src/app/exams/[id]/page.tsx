@@ -33,7 +33,7 @@ export default async function ExamIntro({ params }: { params: Promise<{ id: stri
         <p className="mt-4 text-sm text-zinc-500">{t.exam.oneAttempt}</p>
         <form action={startExam} className="mt-8">
           <input type="hidden" name="exam_id" value={exam.id} />
-          <button className="rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(52,211,153,0.3)] transition hover:bg-emerald-300 active:scale-95">
+          <button className="rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(92,225,230,0.3)] transition hover:bg-emerald-300 active:scale-95">
             {attempt ? t.exam.resume : t.exam.start}
           </button>
         </form>
