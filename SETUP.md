@@ -56,7 +56,7 @@ provider under **Authentication → SMTP Settings** (Brevo, Resend, etc.).
 
 ## 6. Not verified yet (needs your live accounts)
 
-- Bunny token signing (`src/lib/media.ts`) follows Bunny's documented token_path scheme but has not been run against Bunny.
+- ~~Bunny token signing~~ verified against a real Bunny library (2026-11-26): signed HLS plays, the quality menu lists 240p–1080p and switching works, and the same playlist URL without a token returns 403. Still to do before launch: in Bunny's library security settings add your real domain under allowed domains/referrers.
 - SSLCommerz init/validation calls (`src/lib/sslcommerz.ts`) follow the v4 sandbox API but have not been run against SSLCommerz.
 - UI pages were built and type-checked but not clicked through against a live database.
 - Browser-only features (voice notes via MediaRecorder, fullscreen, HLS quality menu) need a manual pass.
