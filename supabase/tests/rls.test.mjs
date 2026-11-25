@@ -20,12 +20,12 @@ await db.exec(`
   grant execute on function storage.foldername(text) to anon, authenticated;
 `);
 
-for (const f of ['schema.sql', 'policies.sql', 'phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql', 'phase8.sql']) {
+for (const f of ['schema.sql', 'policies.sql', 'phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql', 'phase8.sql', 'phase9.sql']) {
   try { await db.exec(sql(f)); console.log('loaded', f); }
   catch (e) { console.log('FAILED to load', f, '->', e.message); process.exit(1); }
 }
 // second pass proves idempotency
-for (const f of ['phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql', 'phase8.sql']) {
+for (const f of ['phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql', 'phase8.sql', 'phase9.sql']) {
   try { await db.exec(sql(f)); } catch (e) { console.log('NOT IDEMPOTENT', f, '->', e.message); }
 }
 console.log('re-ran phases 1-6 (idempotency check) done');
@@ -155,6 +155,14 @@ await t('admin can change a role', () => q(`update profiles set role='moderator'
 await as(null);
 await t('SQL editor / service role can still change roles', () => q(`update profiles set role='student' where id=$1`, [ids.s2]));
 await as('s1');
+
+console.log('\n--- course cards (phase 9) ---');
+await as('admin');
+await t('staff can set instructor, thumbnail path and a higher original price', () => q(`update courses set instructor_name='Fahim', thumbnail_path='x/y.webp', original_price=200 where id=$1`, [course]));
+await t('original price below the price is rejected', () => q(`update courses set original_price=10 where id=$1`, [course]), 'err');
+await as('s1');
+await t('student cannot change course picture or price', async () => { await q(`update courses set instructor_name='hacked' where id=$1`, [course]); await as(null); const n = (await q(`select instructor_name from courses where id=$1`, [course]))[0].instructor_name; await as('s1'); if (n === 'hacked') throw new Error('changed'); });
+await t('thumbnail bucket is public with an image-only limit', async () => { await as(null); const b = (await q(`select public, file_size_limit, allowed_mime_types from storage.buckets where id='course-thumbnails'`))[0]; await as('s1'); if (!b.public || Number(b.file_size_limit) !== 2097152 || b.allowed_mime_types.includes('application/pdf')) throw new Error(JSON.stringify(b)); });
 
 console.log('\n--- server key (phase 8) ---');
 await db.exec('reset role'); await db.exec('set role service_role');

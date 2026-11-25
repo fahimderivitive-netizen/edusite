@@ -1,7 +1,7 @@
 import { connection } from 'next/server'
 import Link from 'next/link'
 import { ArrowRight, BookOpen, ClipboardList, HelpCircle, LifeBuoy } from 'lucide-react'
-import { CourseCover } from '@/components/course/CourseCard'
+import { CourseThumb } from '@/components/course/CourseCard'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getT } from '@/lib/i18n/server'
@@ -17,7 +17,7 @@ export default async function Dashboard() {
 
   const { data: enrollments } = await supabase
     .from('enrollments')
-    .select('id, course_id, courses(slug, title, title_bn, description, description_bn, category)')
+    .select('id, course_id, courses(slug, title, title_bn, description, description_bn, category, thumbnail_path)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -63,7 +63,7 @@ export default async function Dashboard() {
                 href={`/courses/${c.slug}`}
                 className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#111113] transition duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
               >
-                <CourseCover category={c.category} className="h-28" />
+                <div className="aspect-video overflow-hidden bg-zinc-900"><div className="h-full w-full transition duration-500 group-hover:scale-105"><CourseThumb course={c} /></div></div>
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="mb-2 text-lg">{pick(lang, c.title, c.title_bn)}</h3>
                   <p className="mb-4 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{pick(lang, c.description, c.description_bn)}</p>

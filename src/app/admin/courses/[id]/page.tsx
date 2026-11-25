@@ -5,6 +5,7 @@ import { requireStaff } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { deleteRow, saveLesson, saveModule, updateCourse } from '../../actions';
 import ConfirmButton from '@/components/admin/ConfirmButton';
+import { thumbUrl } from '@/lib/thumb';
 import { Field, btn, btnDanger, btnGhost, card, input } from '@/components/admin/ui';
 export const instant = false;
 
@@ -52,6 +53,20 @@ export default async function EditCourse({ params }: { params: Promise<{ id: str
         <Field label="Slug"><input name="slug" required defaultValue={c.slug} className={input} /></Field>
         <Field label="Price (BDT, 0 = free)"><input name="price" type="number" min="0" defaultValue={c.price} className={input} /></Field>
         <Field label="Category"><input name="category" defaultValue={c.category ?? ''} className={input} /></Field>
+        <Field label="Instructor name (shown on the card)"><input name="instructor_name" maxLength={80} defaultValue={c.instructor_name ?? ''} placeholder="e.g. Fahim" className={input} /></Field>
+        <Field label="Original price (BDT, optional: shows a crossed-out price and % off)"><input name="original_price" type="number" min="0" defaultValue={c.original_price ?? ''} placeholder="e.g. 999" className={input} /></Field>
+        <div className="sm:col-span-2">
+          <Field label="Course picture (16:9, e.g. 1280×720, PNG/JPG/WebP, max 2 MB)">
+            <input name="thumbnail" type="file" accept="image/png,image/jpeg,image/webp" className={input} />
+          </Field>
+          {c.thumbnail_path && (
+            <div className="mt-3 flex items-center gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={thumbUrl(c.thumbnail_path)} alt="" className="h-20 w-36 rounded-lg border border-white/10 object-cover" />
+              <label className="flex items-center gap-2 text-sm text-zinc-300"><input type="checkbox" name="remove_thumbnail" className="h-4 w-4 accent-red-400" /> Remove picture</label>
+            </div>
+          )}
+        </div>
         <label className="flex items-center gap-2 self-end pb-2 text-sm text-zinc-300">
           <input type="checkbox" name="published" defaultChecked={c.published} className="h-4 w-4 accent-emerald-400" /> Published
         </label>

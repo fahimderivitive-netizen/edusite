@@ -23,7 +23,7 @@ const en = {
     noneSub: 'Try a different search term or category.',
   },
   categories: { development: 'Development', data: 'Data', design: 'Design' } as Record<string, string>,
-  card: { free: 'Free', view: 'View course' },
+  card: { free: 'Free', view: 'View course', by: 'By', off: '{n}% off', h: 'h', m: 'm' },
   course: {
     modules: '{n} modules',
     lessons: '{n} lessons',
@@ -194,7 +194,7 @@ const bn: Dict = {
     noneSub: 'অন্য শব্দ বা ক্যাটাগরি দিয়ে চেষ্টা করো।',
   },
   categories: { development: 'ডেভেলপমেন্ট', data: 'ডেটা', design: 'ডিজাইন' },
-  card: { free: 'ফ্রি', view: 'কোর্স দেখো' },
+  card: { free: 'ফ্রি', view: 'কোর্স দেখো', by: 'শিক্ষক:', off: '{n}% ছাড়', h: 'ঘণ্টা', m: 'মিনিট' },
   course: {
     modules: '{n}টি মডিউল',
     lessons: '{n}টি লেসন',
@@ -346,5 +346,14 @@ const loc = (lang: Lang) => (lang === 'bn' ? 'bn-BD' : 'en-US');
 export const num = (n: number, lang: Lang) => Number(n).toLocaleString(loc(lang));
 export const fmt = (s: string, n: number, lang: Lang) => s.replace('{n}', num(n, lang));
 export const money = (n: number, lang: Lang) => `৳${num(n, lang)}`;
+// 12000 seconds -> "3h 20m" / "৩ ঘণ্টা ২০ মিনিট"
+export const fmtDuration = (sec: number, lang: Lang) => {
+  const c = dict[lang].card;
+  const mins = Math.round(sec / 60);
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const sep = lang === 'bn' ? ' ' : '';
+  return [h ? `${num(h, lang)}${sep}${c.h}` : '', m || !h ? `${num(m, lang)}${sep}${c.m}` : ''].filter(Boolean).join(' ');
+};
 export const pick = (lang: Lang, en: string | null | undefined, bn: string | null | undefined) =>
   (lang === 'bn' && bn ? bn : en) ?? '';

@@ -1,6 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
-import { ArrowRight, BookOpen, Code2, Database, Palette } from 'lucide-react';
-import { dict, money, pick, type Lang } from '@/lib/i18n/dict';
+import { ArrowRight, BookOpen, Clock, Code2, Database, Palette, UserRound } from 'lucide-react';
+import { dict, fmt, fmtDuration, money, pick, type Lang } from '@/lib/i18n/dict';
+import { thumbUrl } from '@/lib/thumb';
 
 export type CourseSummary = {
   id: string;
@@ -11,6 +13,11 @@ export type CourseSummary = {
   description_bn: string | null;
   price: number;
   category: string | null;
+  thumbnail_path?: string | null;
+  instructor_name?: string | null;
+  original_price?: number | null;
+  lessons?: number;
+  seconds?: number;
 };
 
 const covers: Record<string, { bg: string; text: string; Icon: typeof Code2 }> = {
@@ -32,28 +39,68 @@ export function CourseCover({ category, className = 'h-36' }: { category: string
   );
 }
 
+// The uploaded course picture, or the generated cover when none was uploaded. Fills its parent.
+export function CourseThumb({ course }: { course: { category: string | null; thumbnail_path?: string | null } }) {
+  if (course.thumbnail_path) {
+    return <img src={thumbUrl(course.thumbnail_path)} alt="" loading="lazy" className="h-full w-full object-cover" />;
+  }
+  return <CourseCover category={course.category} className="h-full" />;
+}
+
+export const discountPct = (price: number, original?: number | null) =>
+  original && original > price ? Math.round((1 - price / original) * 100) : 0;
+
 export default function CourseCard({ course, lang }: { course: CourseSummary; lang: Lang }) {
   const t = dict[lang];
+  const free = Number(course.price) === 0;
+  const off = discountPct(Number(course.price), course.original_price);
+  const hasMeta = !!course.lessons || !!course.seconds;
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#111113] transition duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111113] transition duration-300 hover:-translate-y-1 hover:border-emerald-400/40 hover:shadow-[0_14px_44px_rgba(92,225,230,0.12)]"
     >
-      <CourseCover category={course.category} />
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-3 flex items-center justify-between">
+      <div className="relative aspect-video overflow-hidden bg-zinc-900">
+        <div className="h-full w-full transition duration-500 group-hover:scale-105">
+          <CourseThumb course={course} />
+        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
           {course.category ? (
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs font-medium capitalize text-zinc-300">{t.categories[course.category] ?? course.category}</span>
+            <span className="rounded-full bg-black/55 px-2.5 py-1 text-xs font-medium text-zinc-100 backdrop-blur">{t.categories[course.category] ?? course.category}</span>
           ) : <span />}
-          <span className="text-sm font-semibold text-emerald-400">
-            {Number(course.price) === 0 ? t.card.free : money(course.price, lang)}
+          {off > 0 && <span className="rounded-full bg-emerald-400 px-2.5 py-1 text-xs font-bold text-zinc-950">{fmt(t.card.off, off, lang)}</span>}
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="line-clamp-2 text-lg font-semibold leading-snug text-zinc-100">{pick(lang, course.title, course.title_bn)}</h3>
+        {course.instructor_name && (
+          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-zinc-400"><UserRound size={14} /> {t.card.by} {course.instructor_name}</p>
+        )}
+        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-zinc-400">{pick(lang, course.description, course.description_bn)}</p>
+        {hasMeta && (
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-500">
+            {!!course.lessons && <span className="inline-flex items-center gap-1.5"><BookOpen size={14} /> {fmt(t.course.lessons, course.lessons, lang)}</span>}
+            {!!course.seconds && <span className="inline-flex items-center gap-1.5"><Clock size={14} /> {fmtDuration(course.seconds, lang)}</span>}
+          </div>
+        )}
+        <div className="flex-1" />
+        <div className="mt-5 flex items-end justify-between gap-3 border-t border-white/10 pt-4">
+          <div className="flex items-baseline gap-2">
+            {free ? (
+              <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-bold text-emerald-300">{t.card.free}</span>
+            ) : (
+              <>
+                <span className="text-xl font-bold text-emerald-400">{money(course.price, lang)}</span>
+                {off > 0 && <span className="text-sm text-zinc-500 line-through">{money(Number(course.original_price), lang)}</span>}
+              </>
+            )}
+          </div>
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-zinc-300 transition group-hover:text-emerald-400">
+            {t.card.view} <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
           </span>
         </div>
-        <h3 className="mb-2 text-lg text-zinc-100">{pick(lang, course.title, course.title_bn)}</h3>
-        <p className="mb-5 line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{pick(lang, course.description, course.description_bn)}</p>
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300 transition group-hover:text-emerald-400">
-          {t.card.view} <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
-        </span>
       </div>
     </Link>
   );

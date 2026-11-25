@@ -34,9 +34,34 @@ export async function createCourse(fd: FormData) {
 
 export async function updateCourse(fd: FormData) {
   await requireStaff('content');
-  const { id: courseId, published, ...v } = parse(z.object({ id, ...courseFields, published: bool }), fd);
+  const { id: courseId, published, remove_thumbnail, ...v } = parse(z.object({
+    id, ...courseFields, published: bool,
+    instructor_name: opt,
+    original_price: z.string().trim().optional().transform((s) => (s ? Number(s) : null))
+      .refine((n) => n === null || (Number.isFinite(n) && n >= 0), 'Original price must be a number'),
+    remove_thumbnail: bool,
+  }), fd);
+  if (v.original_price !== null && v.original_price < v.price) throw new Error('Original price must be the same as or higher than the price');
   const supabase = await createClient();
-  fail((await supabase.from('courses').update({ ...v, published }).eq('id', courseId)).error);
+
+  // Course picture: optional upload to the public course-thumbnails bucket (PNG/JPG/WebP, max 2 MB).
+  const { data: cur } = await supabase.from('courses').select('thumbnail_path').eq('id', courseId).maybeSingle();
+  let thumb: string | null = cur?.thumbnail_path ?? null;
+  const file = fd.get('thumbnail');
+  if (file instanceof File && file.size > 0) {
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Picture must be a PNG, JPG or WebP image');
+    if (file.size > 2 * 1024 * 1024) throw new Error('Picture must be 2 MB or smaller (try WebP or a smaller JPG)');
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const path = `${courseId}/${Date.now()}.${ext}`;
+    fail((await supabase.storage.from('course-thumbnails').upload(path, file, { contentType: file.type })).error);
+    if (thumb) await supabase.storage.from('course-thumbnails').remove([thumb]);
+    thumb = path;
+  } else if (remove_thumbnail && thumb) {
+    await supabase.storage.from('course-thumbnails').remove([thumb]);
+    thumb = null;
+  }
+
+  fail((await supabase.from('courses').update({ ...v, published, thumbnail_path: thumb }).eq('id', courseId)).error);
   revalidatePath(`/admin/courses/${courseId}`);
 }
 

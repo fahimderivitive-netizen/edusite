@@ -4,6 +4,7 @@ import { ArrowRight, PlayCircle, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import CourseCard from '@/components/course/CourseCard';
 import { getT } from '@/lib/i18n/server';
+import { getCourseStats } from '@/lib/curriculum';
 import { Suspense } from 'react';
 import YouTubeStrip from '@/components/home/YouTubeStrip';
 export const instant = false;
@@ -14,10 +15,11 @@ export default async function Home() {
   const supabase = await createClient();
   const { data: courses } = await supabase
     .from('courses')
-    .select('id, slug, title, title_bn, description, description_bn, price, category')
+    .select('id, slug, title, title_bn, description, description_bn, price, category, thumbnail_path, instructor_name, original_price')
     .eq('published', true)
     .order('title')
     .limit(3);
+  const stats = await getCourseStats(supabase, (courses ?? []).map((c) => c.id));
 
   return (
     <div>
@@ -61,7 +63,7 @@ export default async function Home() {
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {(courses ?? []).map((c) => (
-            <CourseCard key={c.id} course={c} lang={lang} />
+            <CourseCard key={c.id} course={{ ...c, ...stats[c.id] }} lang={lang} />
           ))}
         </div>
       </section>

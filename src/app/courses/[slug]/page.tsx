@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { BookOpen, CheckCircle2, ChevronDown, Lock, PlayCircle } from 'lucide-react';
+import { BookOpen, CheckCircle2, ChevronDown, Lock, PlayCircle, UserRound } from 'lucide-react';
+import { CourseThumb, discountPct } from '@/components/course/CourseCard';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getCurriculum } from '@/lib/curriculum';
@@ -18,13 +19,14 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
 
   const { data: course } = await supabase
     .from('courses')
-    .select('id, title, title_bn, description, description_bn, price')
+    .select('id, title, title_bn, description, description_bn, price, category, thumbnail_path, instructor_name, original_price')
     .eq('slug', slug)
     .eq('published', true)
     .maybeSingle();
   if (!course) notFound();
   const title = pick(lang, course.title, course.title_bn);
   const paid = Number(course.price) > 0;
+  const off = discountPct(Number(course.price), course.original_price);
 
   const { data: { user } } = await supabase.auth.getUser();
   const [modules, enrollment] = await Promise.all([
@@ -63,16 +65,29 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
             </nav>
             <h1 className="text-4xl leading-tight sm:text-5xl">{title}</h1>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-400">{pick(lang, course.description, course.description_bn)}</p>
+            {course.instructor_name && (
+              <p className="mt-5 flex items-center gap-2 text-sm text-zinc-300"><UserRound size={16} className="text-emerald-400" /> {t.card.by} <span className="font-medium text-zinc-100">{course.instructor_name}</span></p>
+            )}
             <div className="mt-6 flex items-center gap-4 text-sm text-zinc-400">
               <span className="inline-flex items-center gap-1.5"><BookOpen size={16} /> {fmt(t.course.modules, modules.length, lang)}</span>
               <span className="inline-flex items-center gap-1.5"><PlayCircle size={16} /> {fmt(t.course.lessons, modules.reduce((n, m) => n + m.lessons.length, 0), lang)}</span>
             </div>
           </div>
 
-          <div className="h-fit rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl">
-            <p className="font-[family-name:var(--font-heading)] text-3xl font-bold tracking-[-0.02em]">
-              {paid ? money(course.price, lang) : t.card.free}
-            </p>
+          <div className="h-fit overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+            <div className="aspect-video overflow-hidden bg-zinc-900"><CourseThumb course={course} /></div>
+            <div className="p-6">
+            <div className="flex items-baseline gap-3">
+              <p className="font-[family-name:var(--font-heading)] text-3xl font-bold tracking-[-0.02em]">
+                {paid ? money(course.price, lang) : t.card.free}
+              </p>
+              {paid && off > 0 && (
+                <>
+                  <span className="text-base text-zinc-500 line-through">{money(Number(course.original_price), lang)}</span>
+                  <span className="rounded-full bg-emerald-400 px-2 py-0.5 text-xs font-bold text-zinc-950">{fmt(t.card.off, off, lang)}</span>
+                </>
+              )}
+            </div>
             <div className="mt-5">
               {enrolled ? (
                 <span className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-medium text-emerald-300">
@@ -98,6 +113,7 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
               )}
             </div>
             <p className="mt-4 text-center text-xs text-zinc-500">{t.course.lifetime}</p>
+            </div>
           </div>
         </div>
       </section>
