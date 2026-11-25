@@ -13,10 +13,11 @@ export default async function AdminPayments() {
   await connection();
   await requireAdmin();
   const supabase = await createClient();
-  const [{ data: payments }, { data: courses }, { data: profiles }] = await Promise.all([
-    supabase.from('payments').select('id, tran_id, user_id, course_id, amount, status, created_at, paid_at, gateway_payload').order('created_at', { ascending: false }).limit(100),
+  const [{ data: payments }, { data: courses }, { data: profiles }, { data: coupons }] = await Promise.all([
+    supabase.from('payments').select('id, tran_id, user_id, course_id, amount, status, created_at, paid_at, gateway_payload, discount_amount, coupon_id').order('created_at', { ascending: false }).limit(100),
     supabase.from('courses').select('id, title'),
     supabase.from('profiles').select('id, full_name'),
+    supabase.from('coupons').select('id, code'),
   ]);
   const emails = new Map<string, string>();
   if (hasServiceKey()) {
@@ -42,7 +43,12 @@ export default async function AdminPayments() {
               <tr key={p.id}>
                 <td className="px-4 py-3">{who(p.user_id)}</td>
                 <td className="px-4 py-3 text-zinc-300">{courses?.find((c) => c.id === p.course_id)?.title}</td>
-                <td className="px-4 py-3">৳{Number(p.amount).toLocaleString('en-US')}</td>
+                <td className="px-4 py-3">
+                  ৳{Number(p.amount).toLocaleString('en-US')}
+                  {Number(p.discount_amount) > 0 && (
+                    <span className="block text-xs text-zinc-500">−৳{Number(p.discount_amount).toLocaleString('en-US')} · {coupons?.find((c) => c.id === p.coupon_id)?.code ?? 'coupon'}</span>
+                  )}
+                </td>
                 <td className={`px-4 py-3 font-medium ${color[p.status] ?? ''}`}>
                   {p.status}
                   {p.status === 'pending' && (p.gateway_payload as { risk_level?: string } | null)?.risk_level === '1' && <span className="block text-xs font-normal text-amber-300">paid, flagged high-risk</span>}

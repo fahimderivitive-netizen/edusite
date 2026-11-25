@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/admin/tickets', label: 'Tickets', show: s.scopes.includes('support') },
     { href: '/admin/users', label: 'Users', show: s.role === 'admin' },
     { href: '/admin/payments', label: 'Payments', show: s.role === 'admin' },
+    { href: '/admin/coupons', label: 'Coupons', show: s.role === 'admin' },
   ].filter((n) => n.show);
 
   return (

@@ -1,4 +1,4 @@
-﻿# Quark of Education setup checklist (Phases 1–6)
+# Quark of Education setup checklist (Phases 1–6)
 
 The code is on `main` and deploys to Vercel automatically on every push. (`feature/platform` is the older working branch.)
 Brand: Quark of Education. Logo files live in `public/` (`logo-mark.png`, `logo-full.png`) and `src/app/` (`icon.png`, `apple-icon.png`, `opengraph-image.png`).
@@ -18,6 +18,9 @@ Brand: Quark of Education. Logo files live in `public/` (`logo-mark.png`, `logo-
 
 All files are idempotent (safe to re-run). `npm run test:sql` replays them in an in-memory Postgres and checks the
 security rules (paid-course lockout, hidden answer keys, grading, privacy between students).
+
+9. `supabase/phase9.sql` – course pictures, instructor name, original price (adds the public `course-thumbnails` bucket)
+10. `supabase/phase10.sql` – coupons (admin-only table, redemption history, `redeem_coupon()`)
 
 ## 2. Make yourself admin
 

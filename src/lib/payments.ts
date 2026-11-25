@@ -35,5 +35,8 @@ export async function settle(
   }).eq('id', pay.id);
   const { error } = await admin.from('enrollments').insert({ user_id: pay.user_id, course_id: pay.course_id, source: 'payment', payment_id: pay.id });
   if (error && error.code !== '23505') throw new Error(error.message);
+  // Count the coupon (if any) only now that the payment is confirmed. Idempotent in the database.
+  const { error: couponErr } = await admin.rpc('redeem_coupon', { p_payment: pay.id });
+  if (couponErr) console.error('redeem_coupon failed:', couponErr.message);
   return 'paid';
 }

@@ -8,6 +8,23 @@ import { requireUser } from '@/lib/auth';
 import { parse } from '@/lib/validate';
 import { limit } from '@/lib/ratelimit';
 import { initSession, siteUrl, sslConfigured } from '@/lib/sslcommerz';
+import { validateCoupon, type CouponFail } from '@/lib/coupons';
+
+export type CouponPreview =
+  | { ok: true; code: string; discount: number; final: number }
+  | { ok: false; reason: CouponFail | 'rate' };
+
+// Shows the student what a code would do. The real price is recomputed again when they pay.
+export async function previewCoupon(courseId: string, code: string): Promise<CouponPreview> {
+  const user = await requireUser();
+  if (!z.guid().safeParse(courseId).success) return { ok: false, reason: 'invalid' };
+  if (!(await limit(`coupon:${user.id}`, 15, 300))) return { ok: false, reason: 'rate' };
+  const supabase = await createClient();
+  const { data: course } = await supabase.from('courses').select('price').eq('id', courseId).eq('published', true).maybeSingle();
+  if (!course || Number(course.price) <= 0) return { ok: false, reason: 'invalid' };
+  const r = await validateCoupon({ code, courseId, userId: user.id, price: Number(course.price) });
+  return r.ok ? { ok: true, code: r.code, discount: r.discount, final: r.final } : r;
+}
 
 export async function startPayment(fd: FormData) {
   const user = await requireUser();
@@ -23,13 +40,40 @@ export async function startPayment(fd: FormData) {
   if (enrolled) redirect(`/courses/${course.slug}`);
   const { data: profile } = await supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle();
 
+  // Optional coupon: validated again here, so a stale or tampered preview cannot lower the price.
+  const listPrice = Number(course.price);
+  let amount = listPrice;
+  let discount = 0;
+  let couponId: string | null = null;
+  const couponCode = String(fd.get('coupon') ?? '').trim();
+  if (couponCode) {
+    const r = await validateCoupon({ code: couponCode, courseId: course.id, userId: user.id, price: listPrice });
+    if (!r.ok) redirect(`/courses/${course.slug}?coupon=${r.reason}`);
+    amount = r.final;
+    discount = r.discount;
+    couponId = r.couponId;
+  }
+
+  const admin = createAdminClient();
   const tran_id = `EDU${Date.now()}${randomBytes(4).toString('hex')}`;
-  const { error } = await createAdminClient().from('payments').insert({ tran_id, user_id: user.id, course_id: course.id, amount: course.price, currency: 'BDT' });
+  const base = { tran_id, user_id: user.id, course_id: course.id, amount, currency: 'BDT', list_price: listPrice, discount_amount: discount, coupon_id: couponId };
+
+  if (amount === 0) {
+    // A 100% coupon: nothing to charge, so skip the gateway and enroll straight away (still recorded as a payment).
+    const { data: pay, error } = await admin.from('payments').insert({ ...base, status: 'paid', paid_at: new Date().toISOString() }).select('id').single();
+    if (error) throw new Error(error.message);
+    const { error: eErr } = await admin.from('enrollments').insert({ user_id: user.id, course_id: course.id, source: 'payment', payment_id: pay.id });
+    if (eErr && eErr.code !== '23505') throw new Error(eErr.message);
+    await admin.rpc('redeem_coupon', { p_payment: pay.id });
+    redirect(`/courses/${course.slug}?pay=success`);
+  }
+
+  const { error } = await admin.from('payments').insert(base);
   if (error) throw new Error(error.message);
 
   const site = siteUrl();
   const url = await initSession({
-    total_amount: String(course.price), currency: 'BDT', tran_id,
+    total_amount: String(amount), currency: 'BDT', tran_id,
     success_url: `${site}/api/payments/sslcommerz/success`,
     fail_url: `${site}/api/payments/sslcommerz/fail`,
     cancel_url: `${site}/api/payments/sslcommerz/cancel`,

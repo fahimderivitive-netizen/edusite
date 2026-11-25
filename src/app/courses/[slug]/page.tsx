@@ -8,12 +8,13 @@ import { connection } from 'next/server';
 import { getT } from '@/lib/i18n/server';
 import { fmt, money, pick } from '@/lib/i18n/dict';
 import { sslConfigured } from '@/lib/sslcommerz';
-import { startPayment } from './actions';
+import { startPayment, previewCoupon } from './actions';
+import CheckoutForm from '@/components/course/CheckoutForm';
 export const instant = false
-export default async function CoursePage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ pay?: string }> }) {
+export default async function CoursePage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ pay?: string; coupon?: string }> }) {
   await connection();
   const { slug } = await params;
-  const { pay } = await searchParams;
+  const { pay, coupon } = await searchParams;
   const { lang, t } = await getT();
   const supabase = await createClient();
 
@@ -49,6 +50,9 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
 
   return (
     <div>
+      {coupon && (
+        <p className="bg-amber-400/10 px-4 py-3 text-center text-sm text-amber-200">{t.course.coupon[coupon] ?? t.course.coupon.invalid}</p>
+      )}
       {(pay === 'success' || pay === 'review' || pay === 'fail' || pay === 'cancel') && (
         <p className={`px-4 py-3 text-center text-sm ${pay === 'success' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-200'}`}>
           {pay === 'success' ? t.course.payOk : pay === 'review' ? t.course.payReview : pay === 'fail' ? t.course.payFail : t.course.payCancel}
@@ -95,12 +99,7 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
                 </span>
               ) : paid ? (
                 sslConfigured() ? (
-                  <form action={startPayment}>
-                    <input type="hidden" name="course_id" value={course.id} />
-                    <button className="w-full rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_24px_rgba(92,225,230,0.3)] transition hover:bg-emerald-300 active:scale-[0.98]">
-                      {t.course.buy} · {money(course.price, lang)}
-                    </button>
-                  </form>
+                  <CheckoutForm courseId={course.id} price={Number(course.price)} lang={lang} loggedIn={!!user} startPayment={startPayment} previewCoupon={previewCoupon} />
                 ) : (
                   <span className="block rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-zinc-400">{t.course.paidSoon}</span>
                 )
