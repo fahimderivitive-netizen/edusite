@@ -9,25 +9,33 @@ export default function AuthForm({ mode, lang }: { mode: 'login' | 'signup'; lan
   const t = dict[lang].auth
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
+  const [busy, setBusy] = useState(false)
   const router = useRouter()
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (busy) return // ignore double taps
     setError('')
+    setInfo('')
+    setBusy(true)
     const f = new FormData(e.currentTarget)
     const email = f.get('email') as string
     const password = f.get('password') as string
     const phone = ((f.get('phone') as string | null) ?? '').trim()
     const fullName = ((f.get('full_name') as string | null) ?? '').trim()
     const supabase = createClient()
-    const { data, error } =
-      mode === 'login'
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName, phone }, emailRedirectTo: `${location.origin}/auth/callback` } })
-    if (error) return setError(error.message)
-    if (mode === 'signup' && !data.session) return setInfo(t.checkEmail)
-    router.push('/dashboard')
-    router.refresh()
+    try {
+      const { data, error } =
+        mode === 'login'
+          ? await supabase.auth.signInWithPassword({ email, password })
+          : await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName, phone }, emailRedirectTo: `${location.origin}/auth/callback` } })
+      if (error) return setError(/rate limit/i.test(error.message) ? t.rateLimit : error.message)
+      if (mode === 'signup' && !data.session) return setInfo(t.checkEmail)
+      router.push('/dashboard')
+      router.refresh()
+    } finally {
+      setBusy(false)
+    }
   }
 
   const login = mode === 'login'
@@ -46,7 +54,7 @@ export default function AuthForm({ mode, lang }: { mode: 'login' | 'signup'; lan
             {login && <Link href="/forgot-password" className="-mt-2 self-end text-xs text-zinc-400 transition hover:text-emerald-400">{t.forgot}</Link>}
             {error && <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
             {info && <p className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">{info}</p>}
-            <button className="rounded-full bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-[0.98]">{login ? t.login : t.signup}</button>
+            <button className="rounded-full bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-[0.98] disabled:opacity-60" disabled={busy}>{login ? t.login : t.signup}</button>
           </form>
           <p className="mt-6 text-center text-sm text-zinc-400">
             <Link href={login ? '/signup' : '/login'} className="font-medium text-emerald-400 hover:text-emerald-300">
