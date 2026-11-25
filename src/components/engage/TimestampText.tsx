@@ -1,15 +1,20 @@
 'use client';
 
-// Renders text where mm:ss patterns become buttons that seek the lesson video.
+const BN = '০১২৩৪৫৬৭৮৯';
+const ascii = (s: string) => s.replace(/[০-৯]/g, (d) => String(BN.indexOf(d)));
+const SPLIT = /(?<![\d০-৯])([\d০-৯]{1,2}:[\d০-৯]{2})(?![\d০-৯])/;
+const IS_TS = /^[\d০-৯]{1,2}:[\d০-৯]{2}$/;
+
+// Renders text where mm:ss patterns (English or Bangla digits) become buttons that seek the lesson video.
 export default function TimestampText({ text }: { text: string }) {
   return (
     <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-300">
-      {text.split(/(\b\d{1,2}:\d{2}\b)/g).map((part, i) =>
-        /^\d{1,2}:\d{2}$/.test(part) ? (
+      {text.split(SPLIT).map((part, i) =>
+        IS_TS.test(part) ? (
           <button
             key={i}
             onClick={() => {
-              const [m, s] = part.split(':').map(Number);
+              const [m, s] = ascii(part).split(':').map(Number);
               window.dispatchEvent(new CustomEvent('edusite:seek', { detail: m * 60 + s }));
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}

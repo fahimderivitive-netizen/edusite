@@ -31,7 +31,7 @@ export async function postComment(fd: FormData) {
   const user = await requireUser();
   const v = parse(z.object({ lesson_id: id, slug: z.string().max(200), parent_id: z.string().optional(), body: z.string().trim().min(1).max(2000) }), fd);
   await throttle(`comment:${user.id}`, 10, 60);
-  const m = v.body.match(/\b(\d{1,2}):(\d{2})\b/);
+  const m = v.body.replace(/[০-৯]/g, (d) => String('০১২৩৪৫৬৭৮৯'.indexOf(d))).match(/(?<!\d)(\d{1,2}):(\d{2})(?!\d)/);
   const supabase = await createClient();
   fail((await supabase.from('lesson_comments').insert({
     lesson_id: v.lesson_id, user_id: user.id, parent_id: v.parent_id || null, body: v.body,
