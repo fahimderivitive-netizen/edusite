@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
           {s.role === 'admin' ? 'Admin' : 'Moderator'} · {s.email}
         </p>
-        <nav className="flex gap-1 overflow-x-auto lg:flex-col">
+        <nav className="flex flex-wrap gap-1 lg:flex-col">
           {nav.map((n) => (
             <Link key={n.href} href={n.href} className="whitespace-nowrap rounded-md px-3 py-2 text-sm text-zinc-400 transition hover:bg-white/5 hover:text-zinc-100">
               {n.label}
