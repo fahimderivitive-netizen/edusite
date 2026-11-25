@@ -26,12 +26,16 @@ function Shell({ title, sub, children }: { title: string; sub?: string; children
 export function ForgotForm({ lang }: { lang: Lang }) {
   const t = dict[lang].auth;
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (sending) return;
+    setSending(true);
     const email = new FormData(e.currentTarget).get('email') as string;
     // Same message whether or not the account exists, so the form cannot be used to probe for emails.
     await createClient().auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/auth/callback?next=/reset-password` });
     setSent(true);
+    setSending(false);
   }
   return (
     <Shell title={t.forgotTitle} sub={t.forgotSub}>
@@ -40,7 +44,7 @@ export function ForgotForm({ lang }: { lang: Lang }) {
       ) : (
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <input name="email" type="email" placeholder={t.email} required className={field} />
-          <button className={submit}>{t.sendLink}</button>
+          <button disabled={sending} className={`${submit} disabled:opacity-60`}>{sending ? t.sending : t.sendLink}</button>
         </form>
       )}
       <p className="mt-6 text-center text-sm"><Link href="/login" className="text-emerald-400 hover:text-emerald-300">{t.backToLogin}</Link></p>

@@ -151,7 +151,8 @@ const en = {
     forgotTitle: 'Reset your password',
     forgotSub: 'Enter your email and we will send you a reset link.',
     sendLink: 'Send reset link',
-    linkSent: 'If that email has an account, a reset link is on its way.',
+    linkSent: 'If that email has an account, a reset link is on its way. Check your Spam folder too.',
+    sending: 'Sending…',
     resetTitle: 'Choose a new password',
     newPassword: 'New password',
     savePassword: 'Save password',
@@ -161,7 +162,7 @@ const en = {
     signup: 'Sign up',
     needAccount: 'Need an account? Sign up',
     haveAccount: 'Have an account? Log in',
-    checkEmail: 'Check your email to confirm your account.',
+    checkEmail: 'Check your email to confirm your account. If you do not see it, look in your Spam folder.',
   },
 };
 
@@ -318,7 +319,8 @@ const bn: Dict = {
     forgotTitle: 'পাসওয়ার্ড রিসেট করো',
     forgotSub: 'তোমার ইমেইল দাও, আমরা একটি রিসেট লিংক পাঠাব।',
     sendLink: 'রিসেট লিংক পাঠাও',
-    linkSent: 'ওই ইমেইলে অ্যাকাউন্ট থাকলে রিসেট লিংক পাঠানো হয়েছে।',
+    linkSent: 'ওই ইমেইলে অ্যাকাউন্ট থাকলে রিসেট লিংক পাঠানো হয়েছে। স্প্যাম ফোল্ডারও দেখো।',
+    sending: 'পাঠানো হচ্ছে…',
     resetTitle: 'নতুন পাসওয়ার্ড দাও',
     newPassword: 'নতুন পাসওয়ার্ড',
     savePassword: 'পাসওয়ার্ড সেভ করো',
@@ -328,7 +330,7 @@ const bn: Dict = {
     signup: 'সাইন আপ',
     needAccount: 'অ্যাকাউন্ট নেই? সাইন আপ করো',
     haveAccount: 'অ্যাকাউন্ট আছে? লগইন করো',
-    checkEmail: 'অ্যাকাউন্ট নিশ্চিত করতে ইমেইল চেক করো।',
+    checkEmail: 'অ্যাকাউন্ট নিশ্চিত করতে ইমেইল চেক করো। না পেলে স্প্যাম ফোল্ডার দেখো।',
   },
 };
 
