@@ -5,6 +5,7 @@ import { connection } from 'next/server';
 import { getT } from '@/lib/i18n/server';
 import { setLang } from '@/lib/i18n/actions';
 import HtmlLang from './HtmlLang';
+import MobileMenu from './MobileMenu';
 
 async function logout() {
   'use server';
@@ -14,6 +15,7 @@ async function logout() {
 }
 
 const link = 'rounded-md px-3 py-2 text-zinc-400 transition hover:bg-white/5 hover:text-zinc-100';
+const pill = 'rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95';
 
 export default async function Navbar() {
   await connection();
@@ -21,6 +23,25 @@ export default async function Navbar() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const role = user ? (await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()).data?.role : null;
+  const staff = role === 'admin' || role === 'moderator';
+
+  const links = [
+    { href: '/', label: t.nav.home },
+    { href: '/courses', label: t.nav.courses },
+    ...(user
+      ? [
+          { href: '/exams', label: t.nav.exams },
+          { href: '/dashboard', label: t.nav.dashboard },
+          { href: '/profile', label: t.nav.profile },
+        ]
+      : []),
+    ...(staff ? [{ href: '/admin', label: 'Admin' }] : []),
+  ];
+  const auth = user ? (
+    <form action={logout}><button className={pill}>{t.nav.logout}</button></form>
+  ) : (
+    <Link href="/login" className={`${pill} text-center`}>{t.nav.login}</Link>
+  );
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#09090B]/80 backdrop-blur-md">
@@ -32,25 +53,20 @@ export default async function Navbar() {
           </svg>
           <span className="font-[family-name:var(--font-heading)] text-lg font-extrabold tracking-[-0.02em]">EduSite</span>
         </Link>
+
         <div className="flex items-center gap-1 text-sm font-medium">
           <HtmlLang lang={lang} />
-          <Link href="/" className={`hidden sm:block ${link}`}>{t.nav.home}</Link>
-          <Link href="/courses" className={link}>{t.nav.courses}</Link>
-          <form action={setLang.bind(null, lang === 'bn' ? 'en' : 'bn')}>
+          <div className="hidden items-center gap-1 md:flex">
+            {links.map((l) => <Link key={l.href} href={l.href} className={link}>{l.label}</Link>)}
+          </div>
+          <form action={setLang.bind(null, lang === 'bn' ? 'en' : 'bn')} className="ml-1">
             <button className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-zinc-300 transition hover:border-white/20 hover:text-zinc-100">{t.nav.switchTo}</button>
           </form>
-          {user ? (
-            <>
-              {(role === 'admin' || role === 'moderator') && <Link href="/admin" className={link}>Admin</Link>}
-              <Link href="/exams" className={`hidden sm:block ${link}`}>{t.nav.exams}</Link>
-              <Link href="/dashboard" className={link}>{t.nav.dashboard}</Link>
-              <form action={logout}>
-                <button className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">{t.nav.logout}</button>
-              </form>
-            </>
-          ) : (
-            <Link href="/login" className="ml-2 rounded-full bg-zinc-100 px-4 py-1.5 text-zinc-950 transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 active:scale-95">{t.nav.login}</Link>
-          )}
+          <div className="ml-2 hidden md:block">{auth}</div>
+          <MobileMenu label={t.nav.menu}>
+            {links.map((l) => <Link key={l.href} href={l.href} className={`${link} py-3 text-base`}>{l.label}</Link>)}
+            <div className="mt-2 flex flex-col">{auth}</div>
+          </MobileMenu>
         </div>
       </div>
     </nav>

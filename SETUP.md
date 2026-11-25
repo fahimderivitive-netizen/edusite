@@ -12,6 +12,7 @@ All code is on branch `feature/platform`. `main` is untouched. Merge only after 
 4. `supabase/phase4.sql` – payments
 5. `supabase/phase5.sql` – exams
 6. `supabase/phase6.sql` – progress, comments, doubts, tickets, bucket limits
+7. `supabase/phase7.sql` – self-service profile edits (name, phone) with a guard that blocks role changes
 
 All files are idempotent (safe to re-run). `npm run test:sql` replays them in an in-memory Postgres and checks the
 security rules (paid-course lockout, hidden answer keys, grading, privacy between students).
@@ -43,7 +44,16 @@ Then use **/admin → Users** to create moderators and tick their scopes (`conte
 - **SSLCommerz sandbox:** in the merchant panel set the IPN URL to `https://YOUR_SITE/api/payments/sslcommerz/ipn`.
 - Success/fail/cancel URLs are sent per payment by the app.
 
-## 5. Not verified yet (needs your live accounts)
+## 5. Supabase Auth settings (needed for password reset and email confirmation)
+
+In Supabase → **Authentication → URL Configuration**:
+- **Site URL:** your real domain (local testing: `http://localhost:3000`).
+- **Redirect URLs:** add `http://localhost:3000/**` and `https://YOUR_DOMAIN/**`.
+
+Supabase's built-in email sender allows only a few emails per hour. Before real students sign up, add a custom SMTP
+provider under **Authentication → SMTP Settings** (Brevo, Resend, etc.).
+
+## 6. Not verified yet (needs your live accounts)
 
 - Bunny token signing (`src/lib/media.ts`) follows Bunny's documented token_path scheme but has not been run against Bunny.
 - SSLCommerz init/validation calls (`src/lib/sslcommerz.ts`) follow the v4 sandbox API but have not been run against SSLCommerz.

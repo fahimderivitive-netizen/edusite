@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Plus_Jakarta_Sans, Inter, Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
+import Footer from "@/components/ui/Footer";
 export const instant = false;
 
 const heading = Plus_Jakarta_Sans({
@@ -37,11 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1">
           <Suspense>{children}</Suspense>
         </main>
-        <footer className="border-t border-white/10">
-          <div className="mx-auto max-w-6xl px-4 py-8 text-center text-sm text-zinc-500">
-            &copy; EduSite
-          </div>
-        </footer>
+        <Suspense fallback={<footer className="h-24 border-t border-white/10" />}>
+          <Footer />
+        </Suspense>
       </body>
     </html>
   );

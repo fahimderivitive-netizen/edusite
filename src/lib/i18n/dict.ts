@@ -1,7 +1,7 @@
 export type Lang = 'bn' | 'en';
 
 const en = {
-  nav: { home: 'Home', courses: 'Courses', exams: 'Exams', dashboard: 'Dashboard', logout: 'Logout', login: 'Login/Signup', switchTo: 'বাংলা' },
+  nav: { home: 'Home', courses: 'Courses', exams: 'Exams', dashboard: 'Dashboard', profile: 'Profile', menu: 'Menu', logout: 'Logout', login: 'Login/Signup', switchTo: 'বাংলা' },
   home: {
     badge: 'New courses every month',
     h1a: 'Learn the craft.',
@@ -135,6 +135,8 @@ const en = {
     openDoubts: '{n} open doubts',
     openTickets: '{n} open tickets',
   },
+  profile: { title: 'My profile', email: 'Email', fullName: 'Full name', phone: 'Mobile number (01XXXXXXXXX)', save: 'Save changes', saved: 'Saved.' },
+  footer: { terms: 'Terms', privacy: 'Privacy', refund: 'Refund policy', support: 'Support' },
   auth: {
     welcome: 'Welcome back',
     create: 'Create your account',
@@ -143,6 +145,17 @@ const en = {
     email: 'Email',
     password: 'Password',
     phone: 'Mobile number (01XXXXXXXXX)',
+    fullName: 'Full name',
+    forgot: 'Forgot password?',
+    forgotTitle: 'Reset your password',
+    forgotSub: 'Enter your email and we will send you a reset link.',
+    sendLink: 'Send reset link',
+    linkSent: 'If that email has an account, a reset link is on its way.',
+    resetTitle: 'Choose a new password',
+    newPassword: 'New password',
+    savePassword: 'Save password',
+    backToLogin: 'Back to log in',
+    resetNeedLink: 'Open this page from the link in your reset email.',
     login: 'Log in',
     signup: 'Sign up',
     needAccount: 'Need an account? Sign up',
@@ -154,7 +167,7 @@ const en = {
 export type Dict = typeof en;
 
 const bn: Dict = {
-  nav: { home: 'হোম', courses: 'কোর্স', exams: 'পরীক্ষা', dashboard: 'ড্যাশবোর্ড', logout: 'লগআউট', login: 'লগইন / সাইন আপ', switchTo: 'English' },
+  nav: { home: 'হোম', courses: 'কোর্স', exams: 'পরীক্ষা', dashboard: 'ড্যাশবোর্ড', profile: 'প্রোফাইল', menu: 'মেনু', logout: 'লগআউট', login: 'লগইন / সাইন আপ', switchTo: 'English' },
   home: {
     badge: 'প্রতি মাসে নতুন কোর্স',
     h1a: 'নিজেকে গড়ে তোলো,',
@@ -288,6 +301,8 @@ const bn: Dict = {
     openDoubts: '{n}টি খোলা ডাউট',
     openTickets: '{n}টি খোলা টিকেট',
   },
+  profile: { title: 'আমার প্রোফাইল', email: 'ইমেইল', fullName: 'পুরো নাম', phone: 'মোবাইল নম্বর (01XXXXXXXXX)', save: 'সেভ করো', saved: 'সেভ হয়েছে।' },
+  footer: { terms: 'শর্তাবলি', privacy: 'গোপনীয়তা নীতি', refund: 'রিফান্ড নীতি', support: 'সাপোর্ট' },
   auth: {
     welcome: 'স্বাগতম',
     create: 'অ্যাকাউন্ট খোলো',
@@ -296,6 +311,17 @@ const bn: Dict = {
     email: 'ইমেইল',
     password: 'পাসওয়ার্ড',
     phone: 'মোবাইল নম্বর (01XXXXXXXXX)',
+    fullName: 'পুরো নাম',
+    forgot: 'পাসওয়ার্ড ভুলে গেছ?',
+    forgotTitle: 'পাসওয়ার্ড রিসেট করো',
+    forgotSub: 'তোমার ইমেইল দাও, আমরা একটি রিসেট লিংক পাঠাব।',
+    sendLink: 'রিসেট লিংক পাঠাও',
+    linkSent: 'ওই ইমেইলে অ্যাকাউন্ট থাকলে রিসেট লিংক পাঠানো হয়েছে।',
+    resetTitle: 'নতুন পাসওয়ার্ড দাও',
+    newPassword: 'নতুন পাসওয়ার্ড',
+    savePassword: 'পাসওয়ার্ড সেভ করো',
+    backToLogin: 'লগইনে ফিরে যাও',
+    resetNeedLink: 'রিসেট ইমেইলের লিংক থেকে এই পাতায় এসো।',
     login: 'লগইন',
     signup: 'সাইন আপ',
     needAccount: 'অ্যাকাউন্ট নেই? সাইন আপ করো',

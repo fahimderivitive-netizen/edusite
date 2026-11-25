@@ -20,12 +20,12 @@ await db.exec(`
   grant execute on function storage.foldername(text) to anon, authenticated;
 `);
 
-for (const f of ['schema.sql', 'policies.sql', 'phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql']) {
+for (const f of ['schema.sql', 'policies.sql', 'phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql']) {
   try { await db.exec(sql(f)); console.log('loaded', f); }
   catch (e) { console.log('FAILED to load', f, '->', e.message); process.exit(1); }
 }
 // second pass proves idempotency
-for (const f of ['phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql']) {
+for (const f of ['phase1.sql', 'phase2.sql', 'phase3.sql', 'phase4.sql', 'phase5.sql', 'phase6.sql', 'phase7.sql']) {
   try { await db.exec(sql(f)); } catch (e) { console.log('NOT IDEMPOTENT', f, '->', e.message); }
 }
 console.log('re-ran phases 1-6 (idempotency check) done');
@@ -35,7 +35,7 @@ for (const [k, id] of Object.entries(ids))
   await db.query(`insert into auth.users (id, email, raw_user_meta_data) values ($1, $2, $3)`, [id, `${k}@x.test`, JSON.stringify({ full_name: k, phone: '01711111111' })]);
 await db.exec(`update profiles set role='admin' where id='${ids.admin}'; update profiles set role='moderator', mod_scopes='{content}' where id='${ids.mod}';`);
 
-const as = async (who) => { await db.exec('reset role'); if (who) { await db.exec(`set role authenticated`); await db.query(`select set_config('request.jwt.claim.sub', $1, false)`, [ids[who]]); } };
+const as = async (who) => { await db.exec('reset role'); await db.query(`select set_config('request.jwt.claim.sub', '', false)`); if (who) { await db.exec(`set role authenticated`); await db.query(`select set_config('request.jwt.claim.sub', $1, false)`, [ids[who]]); } };
 let pass = 0, failN = 0;
 const t = async (name, fn, expect = 'ok') => {
   let res = 'ok', detail = '';
@@ -73,7 +73,7 @@ await t('student cannot write courses (price unchanged)', async () => { await q(
 await as('mod');
 await t('content moderator can write lessons', () => q(`update lessons set title='L2' where id=$1`, [lesson]));
 await t('content moderator can read lesson_media', async () => { if (!(await q(`select * from lesson_media`)).length) throw new Error('hidden'); });
-await t('moderator cannot promote self (role unchanged)', async () => { await q(`update profiles set role='admin' where id=$1`, [ids.mod]); await as(null); const r = (await q(`select role from profiles where id=$1`, [ids.mod]))[0].role; await as('mod'); if (r !== 'moderator') throw new Error('role is ' + r); });
+await t('moderator cannot promote self (blocked by guard trigger)', () => q(`update profiles set role='admin' where id=$1`, [ids.mod]), 'err');
 
 console.log('\n--- exams ---');
 await as(null); await q(`insert into enrollments (user_id,course_id,source) values ($1,$2,'payment')`, [ids.s1, course]);
@@ -136,6 +136,25 @@ await as('s1');
 await q(`insert into ticket_messages (ticket_id,user_id,body) values ($1,$2,'still broken')`, [tk, ids.s1]);
 await t('student reply reopens resolved ticket', async () => { const s = (await q(`select status from tickets where id=$1`, [tk]))[0].status; if (s !== 'open') throw new Error(s); });
 await t('student cannot read payments of others / write payments', () => q(`insert into payments (tran_id,user_id,course_id,amount) values ('x',$1,$2,1)`, [ids.s1, course]), 'err');
+
+console.log('\n--- profiles (phase 7) ---');
+await t('student can edit own name and phone', async () => {
+  await q(`update profiles set full_name='Rahim Uddin', phone='01811111111' where id=$1`, [ids.s1]);
+  const p = (await q(`select full_name from profiles where id=$1`, [ids.s1]))[0];
+  if (p.full_name !== 'Rahim Uddin') throw new Error('not saved');
+});
+await t('student cannot promote self to admin', () => q(`update profiles set role='admin' where id=$1`, [ids.s1]), 'err');
+await t('student cannot grant self moderator scopes', () => q(`update profiles set mod_scopes='{content}' where id=$1`, [ids.s1]), 'err');
+await t("student cannot edit someone else's profile (name unchanged)", async () => {
+  await q(`update profiles set full_name='hacked' where id=$1`, [ids.s2]);
+  await as(null); const n = (await q(`select full_name from profiles where id=$1`, [ids.s2]))[0].full_name; await as('s1');
+  if (n === 'hacked') throw new Error('changed');
+});
+await as('admin');
+await t('admin can change a role', () => q(`update profiles set role='moderator' where id=$1`, [ids.s2]));
+await as(null);
+await t('SQL editor / service role can still change roles', () => q(`update profiles set role='student' where id=$1`, [ids.s2]));
+await as('s1');
 
 await as(null);
 console.log(`\n${pass} passed, ${failN} failed`);
