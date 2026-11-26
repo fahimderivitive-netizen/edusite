@@ -182,6 +182,7 @@ const en = {
     haveAccount: 'Have an account? Log in',
     checkEmail: 'Check your email to confirm your account. If you do not see it, look in your Spam folder.',
   },
+  err: { nfTitle: 'Page not found', nfSub: 'The page you are looking for does not exist or has been moved.', home: 'Back to home', title: 'Something went wrong', sub: 'Please try again.', retry: 'Try again' },
 };
 
 export type Dict = typeof en;
@@ -368,6 +369,7 @@ const bn: Dict = {
     haveAccount: 'অ্যাকাউন্ট আছে? লগইন করো',
     checkEmail: 'অ্যাকাউন্ট নিশ্চিত করতে ইমেইল চেক করো। না পেলে স্প্যাম ফোল্ডার দেখো।',
   },
+  err: { nfTitle: 'পৃষ্ঠাটি পাওয়া যায়নি', nfSub: 'আপনি যে পেজটি খুঁজছেন সেটি নেই বা সরানো হয়েছে।', home: 'হোমে ফিরুন', title: 'কিছু একটা ভুল হয়েছে', sub: 'দয়া করে আবার চেষ্টা করুন।', retry: 'আবার চেষ্টা করুন' },
 };
 
 export const dict: Record<Lang, Dict> = { bn, en };
